@@ -409,66 +409,70 @@
         const respuestasLista = document.getElementById('respuestasLista');
         
         // Función para guardar respuestas en Google Sheets
-        async function guardarRespuestasGoogleSheets() {
-            const fecha = new Date();
-            
-            // Obtener IP del usuario
-            let ip = "No disponible";
-            try {
-                const response = await fetch('https://api.ipify.org?format=json');
-                const data = await response.json();
-                ip = data.ip;
-            } catch (error) {
-                console.log("No se pudo obtener la IP");
-            }
-            
-            // Preparar datos para enviar
-            const datos = {
-                nombre: "Cami",
-                fecha: fecha.toLocaleString('es-ES'),
-                timestamp: fecha.toISOString(),
-                ip: ip,
-                preguntas: preguntas.map(p => ({
-                    pregunta: p.texto,
-                    respuesta: p.respuesta,
-                    tipo: p.tipo,
-                    numero: p.numero
-                }))
-            };
-            
-            try {
-                // Mostrar loading
-                loading.style.display = 'block';
-                
-                // Enviar a Google Sheets
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // Importante para Google Apps Script
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(datos)
-                });
-                
-                console.log("Respuestas guardadas en Google Sheets");
-                
-                // También guardar localmente
-                todasLasRespuestas.push(datos);
-                localStorage.setItem('respuestas_preguntas_cami', JSON.stringify(todasLasRespuestas));
-                
-                return true;
-            } catch (error) {
-                console.error("Error guardando en Google Sheets:", error);
-                
-                // Fallback: guardar solo localmente
-                todasLasRespuestas.push(datos);
-                localStorage.setItem('respuestas_preguntas_cami', JSON.stringify(todasLasRespuestas));
-                
-                return true; // Aceptamos el fallback
-            } finally {
-                loading.style.display = 'none';
-            }
+        // Función para guardar respuestas en Google Sheets
+async function guardarRespuestasGoogleSheets() {
+    const fecha = new Date();
+    
+    // Obtener IP del usuario
+    let ip = "No disponible";
+    try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        ip = data.ip;
+    } catch (error) {
+        console.log("No se pudo obtener la IP");
+    }
+    
+    // Preparar datos para enviar - FORMATO CORREGIDO
+    const datos = {
+        tipo: "preguntas",
+        nombre: "Cami",
+        fecha: fecha.toLocaleString('es-ES'),
+        timestamp: fecha.toISOString(),
+        ip: ip,
+        preguntas: preguntas.map(p => ({
+            pregunta: p.texto,
+            respuesta: p.respuesta,
+            tipo: p.tipo,
+            numero: p.numero
+        }))
+    };
+    
+    try {
+        // Mostrar loading
+        loading.style.display = 'block';
+        
+        // Enviar a Google Sheets
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datos)
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log("Respuestas guardadas en Google Sheets:", result);
         }
+        
+        // También guardar localmente
+        todasLasRespuestas.push(datos);
+        localStorage.setItem('respuestas_preguntas_cami', JSON.stringify(todasLasRespuestas));
+        
+        return true;
+    } catch (error) {
+        console.error("Error guardando en Google Sheets:", error);
+        
+        // Fallback: guardar solo localmente
+        todasLasRespuestas.push(datos);
+        localStorage.setItem('respuestas_preguntas_cami', JSON.stringify(todasLasRespuestas));
+        
+        return true;
+    } finally {
+        loading.style.display = 'none';
+    }
+}
         
         // Función para actualizar progreso
         function actualizarProgreso() {
