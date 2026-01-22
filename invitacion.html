@@ -64,6 +64,11 @@
             }
         }
         
+        @keyframes reducir {
+            0% { transform: scale(1); }
+            100% { transform: scale(0.85); }
+        }
+        
         /* FONDO CON SCROLL */
         .fondo-invitacion {
             min-height: 100vh;
@@ -152,6 +157,7 @@
             transition: all 0.3s;
             min-width: 120px;
             box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+            position: relative;
         }
         
         .btn-no:hover {
@@ -429,7 +435,7 @@
             <div class="mensaje-final" id="mensajeFinal">
                 <h3 class="titulo-final">
                     <i class="fas fa-check-circle"></i> 
-                    ¡Decisión muy sabia!
+                    ¡Decisión muy sabia! 🎉
                 </h3>
                 
                 <p style="margin-bottom: 15px;">
@@ -476,6 +482,9 @@
         
         // Variables
         let contadorNo = 0;
+        let tamañoSi = 24; // Tamaño inicial del botón SÍ
+        let tamañoNo = 20; // Tamaño inicial del botón NO
+        
         const btnSi = document.getElementById('btnSi');
         const btnNo = document.getElementById('btnNo');
         const mensajeFinal = document.getElementById('mensajeFinal');
@@ -483,19 +492,63 @@
         const btnWhatsApp = document.getElementById('btnWhatsApp');
         const scrollIndicator = document.getElementById('scrollIndicator');
         
-        // Hacer crecer el botón "Sí" gradualmente
+        // Mensajes para el botón NO
+        const mensajesNo = [
+            "¿Segura?",
+            "Piénsalo de nuevo",
+            "El dulce te espera 🍭",
+            "Una oportunidad más",
+            "¿Segura de que estás segura?",
+            "Vamos, di que sí 😊",
+            "Mira cómo crece el SÍ...",
+            "Pero si será divertido",
+            "Te prometo dulces ricos",
+            "Última oportunidad...",
+            "El SÍ es más fácil",
+            "¿En serio?",
+            "Pronto cubrirá todo",
+            "El SÍ quiere que aceptes",
+            "¿Por qué te tardas tanto?"
+        ];
+        
+        // Hacer crecer el botón "Sí"
         function hacerCrecerBtnSi() {
-            const tamañoActual = parseFloat(getComputedStyle(btnSi).fontSize);
-            const nuevoTamaño = Math.min(tamañoActual * 1.15, 42);
+            // Aumentar tamaño del botón SÍ (máximo 36px)
+            if (tamañoSi < 36) {
+                tamañoSi += 1.5;
+                btnSi.style.fontSize = `${tamañoSi}px`;
+                
+                // Aumentar padding proporcionalmente
+                const paddingVertical = tamañoSi * 0.7;
+                const paddingHorizontal = tamañoSi * 1.5;
+                btnSi.style.padding = `${paddingVertical}px ${paddingHorizontal}px`;
+            }
             
-            btnSi.style.fontSize = `${nuevoTamaño}px`;
-            btnSi.style.padding = `${nuevoTamaño * 0.8}px ${nuevoTamaño * 1.5}px`;
+            // Hacer más intensa la animación de pulso
+            btnSi.style.animation = 'pulseSuave 0.8s ease-in-out infinite';
             
-            // Si supera cierto tamaño, mostrar advertencia
-            if (nuevoTamaño >= 32) {
-                btnSi.style.animation = 'pulseSuave 1s ease-in-out infinite';
-                // Desplazar suavemente hacia el botón
-                btnSi.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Desplazar suavemente hacia el botón SÍ si es grande
+            if (tamañoSi > 28) {
+                setTimeout(() => {
+                    btnSi.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            }
+        }
+        
+        // Reducir el botón "No"
+        function reducirBtnNo() {
+            // Reducir tamaño del botón NO (mínimo 14px)
+            if (tamañoNo > 14) {
+                tamañoNo -= 0.5;
+                btnNo.style.fontSize = `${tamañoNo}px`;
+                
+                // Reducir padding proporcionalmente
+                const paddingVertical = tamañoNo * 0.8;
+                const paddingHorizontal = tamañoNo * 1.5;
+                btnNo.style.padding = `${paddingVertical}px ${paddingHorizontal}px`;
+                
+                // Aplicar animación de reducción
+                btnNo.style.animation = 'reducir 0.3s ease-out forwards';
             }
         }
         
@@ -584,7 +637,6 @@
             if (guardado) {
                 const data = JSON.parse(guardado);
                 if (data.aceptado) {
-                    // Si ya había aceptado antes, mostrar directamente el mensaje final
                     mostrarMensajeFinal();
                 }
             }
@@ -596,45 +648,25 @@
                 
                 // Efecto visual en botón "NO"
                 this.style.animation = 'shakeSuave 0.4s ease';
-                this.style.transform = 'scale(0.97)';
                 
+                // Cambiar texto del botón NO
+                if (contadorNo <= mensajesNo.length) {
+                    this.innerHTML = `<i class="fas fa-times"></i> ${mensajesNo[contadorNo - 1]}`;
+                } else {
+                    // Si se acaban los mensajes, repetir el último
+                    this.innerHTML = `<i class="fas fa-times"></i> ${mensajesNo[mensajesNo.length - 1]}`;
+                }
+                
+                // Crecer el botón SÍ y reducir el botón NO
+                hacerCrecerBtnSi();
+                reducirBtnNo();
+                
+                // Restablecer animación de shake
                 setTimeout(() => {
                     this.style.animation = '';
-                    this.style.transform = '';
                 }, 400);
                 
-                // Hacer crecer el botón "SÍ"
-                hacerCrecerBtnSi();
-                
-                // Mensajes cambiantes
-                const mensajes = [
-                    "¿Segura?",
-                    "Piénsalo de nuevo",
-                    "El dulce te espera ",
-                    "Una oportunidad más",
-                    "¿Segura de que estás segura?",
-                    "Vamos, di que sí ",
-                    "Mira cómo crece el SÍ...",
-                    "Pero si será divertido",
-                    "Te prometo dulces ricos",
-                    "Última oportunidad...",
-                    "El SÍ es más fácil",
-                    "¿En serio?",
-                    "Pronto cubrirá todo",
-                    "El SÍ quiere que aceptes",
-                    "¿Por qué te tardas tanto?"
-                ];
-                
-                if (contadorNo <= mensajes.length) {
-                    this.innerHTML = `<i class="fas fa-times"></i> ${mensajes[contadorNo - 1]}`;
-                }
-                
-                // Desplazar suavemente hacia el botón SÍ si es grande
-                if (parseFloat(getComputedStyle(btnSi).fontSize) > 28) {
-                    setTimeout(() => {
-                        btnSi.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 300);
-                }
+                console.log(`Botón SÍ: ${tamañoSi}px | Botón NO: ${tamañoNo}px | NOs: ${contadorNo}`);
             });
             
             // Evento para el botón "SÍ"
