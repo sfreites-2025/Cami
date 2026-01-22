@@ -1,0 +1,64 @@
+/* Estilos generales para todas las páginas */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+}
+
+/* Animaciones generales */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.8s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tarjeta-presentacion,
+    .pregunta-box,
+    .contenido-invitacion {
+        padding: 25px !important;
+        margin: 15px;
+    }
+    
+    .titulo-invitacion {
+        font-size: 28px !important;
+    }
+    
+    .btn-si, .btn-no {
+        padding: 20px 30px !important;
+        font-size: 20px !important;
+    }
+    
+    .opciones-respuesta {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+
+/* Scroll personalizado */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #764ba2;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #5a3890;
+}
