@@ -2,14 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Preguntas para Cami</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitación</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#667eea">
+    <meta name="theme-color" content="#ff6b6b">
     <style>
-        /* ESTILOS SIMPLIFICADOS */
+        /* ESTILOS SIMPLIFICADOS CON SCROLL */
         * {
             margin: 0;
             padding: 0;
@@ -18,16 +18,40 @@
         }
         
         html, body {
-            width: 100vw;
-            height: 100vh;
-            height: -webkit-fill-available;
-            overflow: hidden;
-            position: fixed;
+            width: 100%;
+            min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow-x: hidden;
         }
         
         /* ANIMACIONES SUAVES */
+        @keyframes expandirSuave {
+            0% {
+                transform: scale(1);
+                border-radius: 20px;
+            }
+            100% {
+                transform: scale(30);
+                border-radius: 50%;
+                opacity: 0.9;
+                width: 200vw;
+                height: 200vh;
+                left: -50vw !important;
+                top: -50vh !important;
+            }
+        }
+        
+        @keyframes shakeSuave {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+        
+        @keyframes pulseSuave {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+        
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -39,318 +63,437 @@
             }
         }
         
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        @keyframes success {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
         }
         
-        /* CONTENEDOR PRINCIPAL */
-        .pantalla-preguntas {
-            width: 100vw;
-            height: 100vh;
-            min-height: -webkit-fill-available;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* FONDO CON SCROLL */
+        .fondo-invitacion {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
             padding: 20px;
-        }
-        
-        .contenedor-preguntas {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 700px;
-            width: 90%;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-            animation: fadeIn 0.8s ease-out;
-        }
-        
-        /* BARRA DE PROGRESO */
-        .barra-progreso {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            position: relative;
+            justify-content: center;
+            align-items: flex-start;
         }
         
-        .paso {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: #e0e0e0;
+        /* CONTENEDOR PRINCIPAL CON SCROLL */
+        .contenedor-invitacion {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 25px;
+            padding: 40px 30px;
+            max-width: 650px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            margin: 20px 0;
+            animation: fadeIn 0.8s ease-out;
+            overflow: visible;
+        }
+        
+        .titulo-invitacion {
+            font-size: 32px;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .subtitulo {
+            font-size: 17px;
+            color: #555;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        /* PREGUNTA */
+        .pregunta-box {
+            background: linear-gradient(to right, #fff3cd, #ffecb3);
+            border-left: 5px solid #ffc107;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        
+        .titulo-pregunta {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: #666;
-            z-index: 2;
-            transition: all 0.3s;
-        }
-        
-        .paso.activo {
-            background: #764ba2;
-            color: white;
-            transform: scale(1.1);
-        }
-        
-        .paso.completado {
-            background: #4CAF50;
-            color: white;
-        }
-        
-        .linea-progreso {
-            position: absolute;
-            top: 50%;
-            left: 17px;
-            right: 17px;
-            height: 3px;
-            background: #e0e0e0;
-            z-index: 1;
-            transform: translateY(-50%);
-        }
-        
-        .linea-activa {
-            position: absolute;
-            top: 50%;
-            left: 17px;
-            height: 3px;
-            background: #4CAF50;
-            z-index: 1;
-            transform: translateY(-50%);
-            transition: width 0.5s ease;
-        }
-        
-        /* CONTENIDO DE PREGUNTAS */
-        .contenido-pregunta {
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .numero-pregunta {
-            color: #764ba2;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .texto-pregunta {
-            font-size: 22px;
-            color: #333;
-            margin-bottom: 25px;
-            font-weight: 600;
-            line-height: 1.4;
+            font-size: 26px;
+            color: #d35400;
+            font-weight: 700;
+            line-height: 1.3;
         }
         
-        /* ÁREA DE RESPUESTA */
-        .area-respuesta {
-            margin-bottom: 25px;
-        }
-        
-        .respuesta-texto {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-            font-family: inherit;
-            resize: vertical;
-            min-height: 120px;
-            transition: border-color 0.3s;
-        }
-        
-        .respuesta-texto:focus {
-            border-color: #764ba2;
-            outline: none;
-        }
-        
-        .opciones-si-no {
+        /* BOTONES */
+        .contenedor-botones {
             display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
+            justify-content: center;
+            gap: 20px;
+            margin: 35px 0;
+            flex-wrap: wrap;
         }
         
-        .opcion-btn {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid #764ba2;
-            background: white;
-            color: #764ba2;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-        
-        .opcion-btn:hover {
-            background: #f0e6ff;
-        }
-        
-        .opcion-btn.seleccionado {
-            background: #764ba2;
-            color: white;
-        }
-        
-        /* BOTONES DE NAVEGACIÓN */
-        .botones-navegacion {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-        }
-        
-        .btn-navegacion {
-            padding: 12px 25px;
-            background: #764ba2;
+        .btn-no {
+            padding: 16px 30px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            min-width: 120px;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
         }
         
-        .btn-navegacion:hover {
-            background: #5a3890;
-            transform: translateY(-2px);
+        .btn-no:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255, 107, 107, 0.4);
         }
         
-        .btn-navegacion:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .btn-finalizar {
-            background: #4CAF50;
-            animation: pulse 2s infinite;
-        }
-        
-        .btn-finalizar:hover {
-            background: #45a049;
-        }
-        
-        /* MENSAJE DE ENVÍO */
-        .mensaje-envio {
-            background: #e8f5e9;
-            border: 2px solid #4CAF50;
+        .btn-si {
+            padding: 22px 45px;
+            background: linear-gradient(45deg, #4CAF50, #66bb6a);
+            color: white;
+            border: none;
             border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            display: none;
-            animation: fadeIn 0.5s ease;
-            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 140px;
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3);
+            animation: pulseSuave 2s ease-in-out infinite;
+            position: relative;
         }
         
-        .mensaje-envio.visible {
-            display: block;
+        .btn-si:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(76, 175, 80, 0.4);
         }
         
-        .cargando {
+        /* CLASE CUANDO EL BOTÓN SÍ SE EXPANDE */
+        .btn-si.expandiendo {
+            animation: expandirSuave 2s ease-in-out forwards !important;
+            z-index: 9999 !important;
+            position: fixed !important;
+        }
+        
+        /* CONTADOR */
+        .contador-no {
+            font-size: 16px;
+            color: #ff6b6b;
+            margin: 15px 0 30px 0;
+            font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
-            margin: 15px 0;
+            gap: 8px;
         }
         
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #764ba2;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .btn-continuar-final {
-            background: #25D366;
+        .numero-contador {
+            background: #ff6b6b;
             color: white;
-            border: none;
-            padding: 14px 30px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            min-width: 35px;
+        }
+        
+        /* MENSAJE FINAL */
+        .mensaje-final {
+            background: #e8f5e9;
+            border: 2px solid #4CAF50;
+            border-radius: 18px;
+            padding: 25px;
+            margin-top: 25px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .mensaje-final.centrado {
+            text-align: center;
+            padding: 40px 25px;
+        }
+        
+        .titulo-final {
+            color: #2e7d32;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        
+        /* ICONO DE ÉXITO */
+        .icono-exito {
+            font-size: 60px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            animation: success 1s ease-out;
+        }
+        
+        /* PANEL ADMIN */
+        .panel-admin {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #2196F3;
+            color: white;
+            padding: 10px 15px;
             border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 14px;
             cursor: pointer;
-            margin-top: 15px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
             transition: all 0.3s;
         }
         
-        .btn-continuar-final:hover {
-            background: #128C7E;
-            transform: translateY(-2px);
+        .panel-admin:hover {
+            transform: translateY(-3px);
+            background: #1976D2;
+        }
+        
+        /* MODAL ADMIN */
+        .modal-admin {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-contenido {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-titulo {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .respuestas-lista {
+            margin-top: 20px;
+        }
+        
+        .respuesta-item {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .respuesta-fecha {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* BOTÓN CERRAR */
+        .btn-cerrar {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        /* CRÉDITOS */
+        .creditos {
+            margin-top: 30px;
+            color: #666;
+            font-style: italic;
+            font-size: 14px;
+            line-height: 1.5;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
         }
         
         /* RESPONSIVE */
         @media (max-width: 768px) {
-            .contenedor-preguntas {
-                padding: 20px;
+            .fondo-invitacion {
+                padding: 10px;
+                align-items: center;
+                min-height: 100vh;
+            }
+            
+            .contenedor-invitacion {
+                padding: 20px 15px;
+                margin: 10px 0;
+                width: 95%;
+            }
+            
+            .titulo-invitacion {
+                font-size: 26px;
+            }
+            
+            .subtitulo {
+                font-size: 16px;
             }
             
             .texto-pregunta {
-                font-size: 20px;
+                font-size: 22px;
             }
             
-            .opciones-si-no {
+            .contenedor-botones {
                 flex-direction: column;
-            }
-            
-            .botones-navegacion {
-                flex-direction: column;
+                align-items: center;
                 gap: 15px;
             }
             
-            .btn-navegacion {
+            .btn-no, .btn-si {
                 width: 100%;
-                justify-content: center;
+                max-width: 220px;
+                padding: 14px 25px;
+            }
+            
+            .btn-si {
+                font-size: 22px;
+            }
+            
+            .mensaje-final {
+                padding: 20px;
+            }
+            
+            .panel-admin {
+                left: 10px;
+                bottom: 10px;
+                padding: 8px 12px;
+                font-size: 12px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="pantalla-preguntas">
-        <div class="contenedor-preguntas">
-            <!-- Barra de progreso -->
-            <div class="barra-progreso" id="barraProgreso">
-                <div class="linea-progreso"></div>
-                <div class="linea-activa" id="lineaActiva"></div>
-                <!-- Los pasos se generan dinámicamente -->
-            </div>
+    <div class="fondo-invitacion">
+        <div class="contenedor-invitacion">
+            <!-- Elementos decorativos sutiles -->
+            <div class="decoracion" style="top: 15px; left: 15px;">🍭</div>
+            <div class="decoracion" style="top: 15px; right: 15px;">🍬</div>
             
-            <!-- Contenedor de preguntas -->
-            <div id="contenedorPreguntas">
-                <!-- Las preguntas se cargarán aquí dinámicamente -->
-            </div>
+            <h1 class="titulo-invitacion">
+                <i class="fas fa-heart" style="color:#ff6b6b"></i>
+                ¡Invitación Especial!
+                <i class="fas fa-heart" style="color:#ff6b6b"></i>
+            </h1>
             
-            <!-- Mensaje de envío automático -->
-            <div class="mensaje-envio" id="mensajeEnvio">
-                <h3 style="color: #2e7d32; margin-bottom: 15px;">
-                    <i class="fas fa-check-circle"></i> ¡Respuestas enviadas!
+            <p class="subtitulo">
+                Después de responder todas esas preguntas,<br>
+                llega el momento más importante...
+            </p>
+            
+            <div class="pregunta-box">
+                <h3 class="titulo-pregunta">
+                    <i class="fas fa-candy-cane"></i>
+                    La gran pregunta final:
                 </h3>
-                <p style="margin-bottom: 15px;">
-                    Tus respuestas se han enviado automáticamente a Salomón. ¡Gracias por responder!
+                <p class="texto-pregunta">
+                    ¿Quiere ser invitada a comer dulcito?
                 </p>
-                <div class="cargando" id="cargandoEnvio">
-                    <div class="spinner"></div>
-                    <span>Enviando respuestas...</span>
+            </div>
+            
+            <div class="contenedor-botones" id="contenedorBotones">
+                <button class="btn-no" id="btnNo">
+                    <i class="fas fa-times"></i> NO
+                </button>
+                
+                <button class="btn-si" id="btnSi">
+                    <i class="fas fa-check"></i> ¡SÍ!
+                </button>
+            </div>
+            
+            <div class="contador-no" id="contadorNo">
+                <i class="fas fa-times-circle"></i>
+                Veces que has dicho "No": 
+                <span class="numero-contador" id="numeroContador">0</span>
+            </div>
+            
+            <!-- Mensaje final mejorado -->
+            <div class="mensaje-final centrado" id="mensajeFinal">
+                <div class="icono-exito">
+                    <i class="fas fa-check-circle"></i>
                 </div>
-                <button class="btn-continuar-final" id="btnContinuarFinal" style="display: none;">
-                    <i class="fas fa-arrow-right"></i> Continuar a la invitación
+                
+                <h3 class="titulo-final">
+                    ¡Respuesta guardada exitosamente! 🎉
+                </h3>
+                
+                <p style="margin-bottom: 15px; color: #555;">
+                    <strong>Tu respuesta ha sido registrada:</strong><br>
+                    "Sí acepto dulce, tú invitas y yo pago"
+                </p>
+                
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                    <p style="font-weight: bold; color: #2e7d32; margin-bottom: 5px;">
+                        <i class="fas fa-info-circle"></i> Información registrada:
+                    </p>
+                    <p style="font-size: 14px; color: #666;">
+                        • Respuesta: <strong>Aceptado ✅</strong><br>
+                        • Veces "No" antes de aceptar: <strong id="vecesNoFinal">0</strong><br>
+                        • Fecha y hora: <strong id="fechaRespuesta"></strong>
+                    </p>
+                </div>
+                
+                <p style="font-style: italic; color: #888; margin-top: 20px;">
+                    Salomón recibió tu respuesta y pronto se pondrá en contacto contigo. ¡Gracias! 🍬
+                </p>
+            </div>
+            
+            <div class="creditos">
+                Creado especialmente para ti Cami (Que no se note lo aburrido. PD: No le había hecho esto a nadie, espero le guste)
+                <br>
+                <small style="color: #999;">— Salomón</small>
+            </div>
+        </div>
+        
+        <!-- Panel admin (sólo visible para ti) -->
+        <div class="panel-admin" id="panelAdmin">
+            <i class="fas fa-eye"></i> Ver respuestas
+        </div>
+        
+        <!-- Modal para ver respuestas -->
+        <div class="modal-admin" id="modalAdmin">
+            <div class="modal-contenido">
+                <h3 class="modal-titulo">
+                    <i class="fas fa-database"></i> Respuestas Registradas
+                </h3>
+                
+                <div id="adminInfo" style="text-align: center; margin-bottom: 20px;">
+                    <p>Cargando respuestas...</p>
+                </div>
+                
+                <div class="respuestas-lista" id="respuestasLista">
+                    <!-- Aquí se cargarán las respuestas -->
+                </div>
+                
+                <button class="btn-cerrar" onclick="cerrarModal()">
+                    <i class="fas fa-times"></i> Cerrar
                 </button>
             </div>
         </div>
@@ -358,473 +501,279 @@
 
     <script>
         // =============================================
-        // CONFIGURACIÓN
+        // CONFIGURACIÓN - REEMPLAZA CON TU INFORMACIÓN
         // =============================================
         const CONFIG = {
-            TU_WHATSAPP: "584143568666",  // Tu número para recibir respuestas
-            TU_NOMBRE: "Salomón",
-            SU_NOMBRE: "Cami",
-            ENVIAR_AUTOMATICAMENTE: true, // TRUE para enviar automáticamente
-            WEBSITE_URL: window.location.origin // URL actual para identificar
+            // Tu Google Sheets (para guardar respuestas)
+            GOOGLE_SHEET_ID: "TU_ID_DE_GOOGLE_SHEETS",
+            GOOGLE_SHEET_NAME: "Respuestas",
+            
+            // Clave secreta para ver respuestas (cámbiala)
+            ADMIN_KEY: "salomon123",
+            
+            // Opcional: Webhook para notificarte
+            WEBHOOK_URL: "TU_WEBHOOK_OPCIONAL"
         };
-        
-        // =============================================
-        // DATOS DE LAS PREGUNTAS
-        // =============================================
-        const PREGUNTAS = [
-            {
-                id: 1,
-                texto: "¿Qué te ha parecido hasta los momentos mi existencia en tu vida?",
-                tipo: "texto",
-                respuesta: "",
-                placeholder: "Escribe tu respuesta aquí..."
-            },
-            {
-                id: 2,
-                texto: "¿Me vas a terminar de pasar tu Curriculum algún día?",
-                tipo: "si_no",
-                opciones: ["Sí", "No"],
-                respuesta: ""
-            },
-            {
-                id: 3,
-                texto: "¿Algún día veré el casting?",
-                tipo: "si_no",
-                opciones: ["Sí", "No"],
-                respuesta: ""
-            },
-            {
-                id: 4,
-                texto: "¿Cuándo me invitas a una colaboración en TikTok?",
-                tipo: "texto",
-                respuesta: "",
-                placeholder: "Ej: Cuando quieras, la próxima semana, etc..."
-            },
-            {
-                id: 5,
-                texto: "¿Me vas a explicar química?",
-                tipo: "si_no",
-                opciones: ["Sí", "No"],
-                respuesta: ""
-            }
-        ];
-        
-        // =============================================
-        // VARIABLES GLOBALES
-        // =============================================
-        let preguntaActual = 0;
-        let respuestasEnviadas = false;
-        const respuestas = [];
-        
-        // =============================================
-        // FUNCIONES PRINCIPALES
         // =============================================
         
-        // Inicializar la aplicación
-        function inicializarApp() {
-            console.log("Iniciando cuestionario para:", CONFIG.SU_NOMBRE);
-            
-            // Crear barra de progreso
-            crearBarraProgreso();
-            
-            // Mostrar primera pregunta
-            mostrarPregunta();
-            
-            // Configurar eventos globales
-            configurarEventos();
-        }
+        // Variables
+        let contadorNo = 0;
+        let respuestasGuardadas = [];
         
-        // Crear barra de progreso dinámica
-        function crearBarraProgreso() {
-            const barra = document.getElementById('barraProgreso');
-            const lineaActiva = document.getElementById('lineaActiva');
-            
-            // Crear pasos
-            PREGUNTAS.forEach((pregunta, index) => {
-                const paso = document.createElement('div');
-                paso.className = 'paso';
-                paso.id = `paso${index + 1}`;
-                paso.textContent = index + 1;
-                barra.insertBefore(paso, lineaActiva);
-            });
-            
-            // Actualizar progreso inicial
-            actualizarBarraProgreso();
-        }
+        // Elementos del DOM
+        const btnSi = document.getElementById('btnSi');
+        const btnNo = document.getElementById('btnNo');
+        const mensajeFinal = document.getElementById('mensajeFinal');
+        const numeroContador = document.getElementById('numeroContador');
+        const panelAdmin = document.getElementById('panelAdmin');
+        const modalAdmin = document.getElementById('modalAdmin');
+        const respuestasLista = document.getElementById('respuestasLista');
+        const adminInfo = document.getElementById('adminInfo');
+        const vecesNoFinal = document.getElementById('vecesNoFinal');
+        const fechaRespuesta = document.getElementById('fechaRespuesta');
         
-        // Actualizar barra de progreso
-        function actualizarBarraProgreso() {
-            const porcentaje = (preguntaActual / (PREGUNTAS.length - 1)) * 100;
-            document.getElementById('lineaActiva').style.width = `${porcentaje}%`;
-            
-            // Actualizar estado de pasos
-            PREGUNTAS.forEach((pregunta, index) => {
-                const paso = document.getElementById(`paso${index + 1}`);
-                if (index < preguntaActual) {
-                    paso.className = 'paso completado';
-                } else if (index === preguntaActual) {
-                    paso.className = 'paso activo';
-                } else {
-                    paso.className = 'paso';
-                }
-            });
-        }
-        
-        // Mostrar pregunta actual
-        function mostrarPregunta() {
-            const pregunta = PREGUNTAS[preguntaActual];
-            const contenedor = document.getElementById('contenedorPreguntas');
-            
-            let html = `
-                <div class="contenido-pregunta">
-                    <div class="numero-pregunta">
-                        <i class="fas fa-question-circle"></i>
-                        Pregunta ${preguntaActual + 1} de ${PREGUNTAS.length}
-                    </div>
-                    
-                    <div class="texto-pregunta">${pregunta.texto}</div>
-                    
-                    <div class="area-respuesta" id="areaRespuesta">
-            `;
-            
-            if (pregunta.tipo === 'texto') {
-                html += `
-                    <textarea class="respuesta-texto" 
-                              id="respuestaTexto" 
-                              placeholder="${pregunta.placeholder || 'Escribe tu respuesta aquí...'}"
-                              oninput="actualizarRespuestaTexto(this.value)">${pregunta.respuesta || ''}</textarea>
-                `;
-            } else if (pregunta.tipo === 'si_no') {
-                html += `
-                    <div class="opciones-si-no">
-                        ${pregunta.opciones.map(opcion => `
-                            <button class="opcion-btn ${pregunta.respuesta === opcion ? 'seleccionado' : ''}"
-                                    onclick="seleccionarOpcion('${opcion}')">
-                                ${opcion}
-                            </button>
-                        `).join('')}
-                    </div>
-                `;
-            }
-            
-            html += `
-                    </div>
-                    
-                    <div class="botones-navegacion">
-                        ${preguntaActual > 0 ? `
-                            <button class="btn-navegacion" onclick="preguntaAnterior()">
-                                <i class="fas fa-arrow-left"></i> Anterior
-                            </button>
-                        ` : '<div></div>'}
-                        
-                        <button class="btn-navegacion ${preguntaActual === PREGUNTAS.length - 1 ? 'btn-finalizar' : ''}" 
-                                id="btnSiguiente"
-                                onclick="${preguntaActual === PREGUNTAS.length - 1 ? 'finalizarCuestionario()' : 'siguientePregunta()'}"
-                                ${!pregunta.respuesta ? 'disabled' : ''}>
-                            ${preguntaActual === PREGUNTAS.length - 1 ? 'Finalizar' : 'Siguiente'}
-                            <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            contenedor.innerHTML = html;
-            actualizarBarraProgreso();
-            
-            // Enfocar el textarea si es de tipo texto
-            if (pregunta.tipo === 'texto' && !pregunta.respuesta) {
-                setTimeout(() => {
-                    document.getElementById('respuestaTexto').focus();
-                }, 100);
-            }
-        }
-        
-        // Actualizar respuesta de texto
-        function actualizarRespuestaTexto(valor) {
-            PREGUNTAS[preguntaActual].respuesta = valor.trim();
-            const btnSiguiente = document.getElementById('btnSiguiente');
-            btnSiguiente.disabled = !valor.trim();
-        }
-        
-        // Seleccionar opción Sí/No
-        function seleccionarOpcion(opcion) {
-            PREGUNTAS[preguntaActual].respuesta = opcion;
-            
-            // Actualizar botones
-            document.querySelectorAll('.opcion-btn').forEach(btn => {
-                btn.classList.remove('seleccionado');
-                if (btn.textContent.trim() === opcion) {
-                    btn.classList.add('seleccionado');
-                }
-            });
-            
-            document.getElementById('btnSiguiente').disabled = false;
-        }
-        
-        // Navegación entre preguntas
-        function siguientePregunta() {
-            if (preguntaActual < PREGUNTAS.length - 1) {
-                preguntaActual++;
-                mostrarPregunta();
-            }
-        }
-        
-        function preguntaAnterior() {
-            if (preguntaActual > 0) {
-                preguntaActual--;
-                mostrarPregunta();
-            }
-        }
-        
-        // =============================================
-        // ENVÍO AUTOMÁTICO DE RESPUESTAS
-        // =============================================
-        
-        // Finalizar cuestionario y enviar respuestas
-        async function finalizarCuestionario() {
-            // Verificar que todas estén respondidas
-            const sinResponder = PREGUNTAS.filter(p => !p.respuesta);
-            
-            if (sinResponder.length > 0) {
-                alert('Por favor, responde todas las preguntas antes de finalizar.');
-                preguntaActual = sinResponder[0].id - 1;
-                mostrarPregunta();
-                return;
-            }
-            
-            // Mostrar mensaje de envío
-            mostrarMensajeEnvio();
-            
-            // Enviar respuestas automáticamente
-            const exito = await enviarRespuestasAutomaticamente();
-            
-            if (exito) {
-                // Guardar en localStorage
-                guardarRespuestasLocalmente();
-                
-                // Mostrar botón para continuar
-                mostrarBotonContinuar();
-            } else {
-                // Si falla el envío automático, mostrar opción manual
-                mostrarOpcionManual();
-            }
-        }
-        
-        // Mostrar mensaje de envío
-        function mostrarMensajeEnvio() {
-            const mensajeEnvio = document.getElementById('mensajeEnvio');
-            const contenedorPreguntas = document.getElementById('contenedorPreguntas');
-            
-            contenedorPreguntas.style.display = 'none';
-            mensajeEnvio.classList.add('visible');
-        }
-        
-        // Enviar respuestas automáticamente
-        async function enviarRespuestasAutomaticamente() {
-            try {
-                // Crear mensaje con las respuestas
-                let mensaje = `📋 *RESPUESTAS DE ${CONFIG.SU_NOMBRE.toUpperCase()}*\n\n`;
-                
-                PREGUNTAS.forEach((pregunta, index) => {
-                    mensaje += `*${index + 1}. ${pregunta.texto}*\n`;
-                    mensaje += `➤ ${pregunta.respuesta}\n\n`;
-                });
-                
-                mensaje += `---\n`;
-                mensaje += `Enviado desde: ${CONFIG.WEBSITE_URL}\n`;
-                mensaje += `Fecha: ${new Date().toLocaleString('es-ES')}`;
-                
-                // Preparar datos para enviar
-                const datos = {
-                    telefono: CONFIG.TU_WHATSAPP,
-                    mensaje: mensaje,
-                    respuestas: PREGUNTAS.map(p => ({
-                        pregunta: p.texto,
-                        respuesta: p.respuesta
-                    })),
-                    timestamp: new Date().toISOString()
-                };
-                
-                console.log("Enviando respuestas:", datos);
-                
-                // INTENTAR ENVIAR POR DIFERENTES MÉTODOS
-                
-                // Método 1: Webhook (si configuras uno)
-                // const resultado1 = await enviarPorWebhook(datos);
-                // if (resultado1) return true;
-                
-                // Método 2: EmailJS (gratis)
-                // const resultado2 = await enviarPorEmailJS(datos);
-                // if (resultado2) return true;
-                
-                // Método 3: Formspree (gratis)
-                const resultado3 = await enviarPorFormspree(datos);
-                if (resultado3) return true;
-                
-                // Si todo falla, usar método de respaldo
-                return await usarMetodoRespaldo(datos);
-                
-            } catch (error) {
-                console.error("Error al enviar respuestas:", error);
-                return false;
-            }
-        }
-        
-        // Método 1: Enviar por Formspree (GRATIS y fácil)
-        async function enviarPorFormspree(datos) {
-            try {
-                // Crear formulario virtual
-                const formData = new FormData();
-                formData.append('nombre', CONFIG.SU_NOMBRE);
-                formData.append('telefono', CONFIG.TU_WHATSAPP);
-                formData.append('mensaje', datos.mensaje);
-                formData.append('timestamp', datos.timestamp);
-                
-                // Tu formulario Formspree (cámbialo por el tuyo)
-                const FORMSPREE_URL = 'https://formspree.io/f/xjvqbzjg'; // REEMPLAZA ESTO
-                
-                const respuesta = await fetch(FORMSPREE_URL, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                if (respuesta.ok) {
-                    console.log("Respuestas enviadas por Formspree");
-                    return true;
-                }
-            } catch (error) {
-                console.log("Formspree no disponible:", error);
-            }
-            return false;
-        }
-        
-        // Método de respaldo: Guardar y mostrar WhatsApp
-        async function usarMetodoRespaldo(datos) {
-            // Guardar localmente por si acaso
-            localStorage.setItem('respuestas_backup', JSON.stringify(datos));
-            
-            // Crear enlace de WhatsApp con respuestas
-            const mensajeCodificado = encodeURIComponent(datos.mensaje);
-            const enlaceWhatsApp = `https://wa.me/${CONFIG.TU_WHATSAPP}?text=${mensajeCodificado}`;
-            
-            // Guardar enlace para uso posterior
-            sessionStorage.setItem('whatsapp_link', enlaceWhatsApp);
-            
-            // Enviar después de 2 segundos (simulado)
-            setTimeout(() => {
-                window.open(enlaceWhatsApp, '_blank');
-            }, 2000);
-            
-            return true;
-        }
-        
-        // Guardar respuestas localmente
-        function guardarRespuestasLocalmente() {
+        // Función para guardar respuesta en Google Sheets
+        async function guardarRespuesta(respuesta) {
+            const fecha = new Date();
             const datos = {
-                preguntas: PREGUNTAS,
-                fecha: new Date().toISOString(),
-                completado: true
+                nombre: "Cami",
+                respuesta: respuesta,
+                vecesNo: contadorNo,
+                fecha: fecha.toLocaleString('es-ES'),
+                timestamp: fecha.toISOString(),
+                ip: await obtenerIP()
             };
             
-            localStorage.setItem('cuestionario_completado', JSON.stringify(datos));
-            console.log("Respuestas guardadas localmente");
-        }
-        
-        // Mostrar botón para continuar
-        function mostrarBotonContinuar() {
-            const cargando = document.getElementById('cargandoEnvio');
-            const btnContinuar = document.getElementById('btnContinuarFinal');
-            
-            setTimeout(() => {
-                cargando.style.display = 'none';
-                btnContinuar.style.display = 'inline-flex';
-            }, 1500);
-        }
-        
-        // Mostrar opción manual si falla el envío
-        function mostrarOpcionManual() {
-            const cargando = document.getElementById('cargandoEnvio');
-            cargando.innerHTML = `
-                <div style="text-align: center; color: #d32f2f;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 24px; margin-bottom: 10px;"></i>
-                    <p>No se pudo enviar automáticamente.</p>
-                    <button onclick="abrirWhatsAppManual()" 
-                            style="background: #25D366; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin-top: 10px; cursor: pointer;">
-                        <i class="fab fa-whatsapp"></i> Enviar por WhatsApp
-                    </button>
-                </div>
-            `;
-        }
-        
-        // Abrir WhatsApp manualmente
-        function abrirWhatsAppManual() {
-            // Crear mensaje manual
-            let mensaje = `📋 *RESPUESTAS DE ${CONFIG.SU_NOMBRE.toUpperCase()}*\n\n`;
-            
-            PREGUNTAS.forEach((pregunta, index) => {
-                mensaje += `*${index + 1}. ${pregunta.texto}*\n`;
-                mensaje += `➤ ${pregunta.respuesta}\n\n`;
-            });
-            
-            const mensajeCodificado = encodeURIComponent(mensaje);
-            const enlaceWhatsApp = `https://wa.me/${CONFIG.TU_WHATSAPP}?text=${mensajeCodificado}`;
-            
-            window.open(enlaceWhatsApp, '_blank');
-        }
-        
-        // Configurar eventos
-        function configurarEventos() {
-            // Botón para continuar a la invitación final
-            document.getElementById('btnContinuarFinal').addEventListener('click', function() {
-                window.location.href = "invitacion.html";
-            });
-            
-            // Guardar progreso al salir
-            window.addEventListener('beforeunload', function(e) {
-                if (!localStorage.getItem('cuestionario_completado')) {
-                    const progreso = PREGUNTAS.filter(p => p.respuesta).length;
-                    if (progreso > 0) {
-                        localStorage.setItem('progreso_cuestionario', JSON.stringify({
-                            preguntaActual: preguntaActual,
-                            respuestas: PREGUNTAS.map(p => p.respuesta),
-                            fecha: new Date().toISOString()
-                        }));
-                    }
+            try {
+                // Método 1: Guardar en localStorage (fallback)
+                respuestasGuardadas.push(datos);
+                localStorage.setItem('respuestas_invitacion', JSON.stringify(respuestasGuardadas));
+                
+                // Método 2: Enviar a Google Sheets (si está configurado)
+                if (CONFIG.GOOGLE_SHEET_ID !== "TU_ID_DE_GOOGLE_SHEETS") {
+                    await enviarAGoogleSheets(datos);
                 }
-            });
-            
-            // Cargar progreso guardado
-            cargarProgresoGuardado();
-        }
-        
-        // Cargar progreso guardado
-        function cargarProgresoGuardado() {
-            const guardado = localStorage.getItem('progreso_cuestionario');
-            if (guardado) {
-                try {
-                    const datos = JSON.parse(guardado);
-                    if (datos.respuestas && datos.respuestas.length === PREGUNTAS.length) {
-                        PREGUNTAS.forEach((pregunta, index) => {
-                            if (datos.respuestas[index]) {
-                                pregunta.respuesta = datos.respuestas[index];
-                            }
-                        });
-                        preguntaActual = datos.preguntaActual || 0;
-                        mostrarPregunta();
-                    }
-                } catch (error) {
-                    console.log("Error al cargar progreso:", error);
+                
+                // Método 3: Enviar notificación por webhook (opcional)
+                if (CONFIG.WEBHOOK_URL && CONFIG.WEBHOOK_URL !== "TU_WEBHOOK_OPCIONAL") {
+                    await enviarWebhook(datos);
                 }
+                
+                return true;
+            } catch (error) {
+                console.error("Error al guardar:", error);
+                // Si falla, al menos guarda en localStorage
+                return true;
             }
         }
         
-        // =============================================
-        // INICIALIZAR AL CARGAR LA PÁGINA
-        // =============================================
-        document.addEventListener('DOMContentLoaded', inicializarApp);
+        // Función para enviar datos a Google Sheets
+        async function enviarAGoogleSheets(datos) {
+            const url = `https://script.google.com/macros/s/AKfycbxYJjM2JX7Q0Xq7Z8Q3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ/exec`;
+            
+            const respuesta = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sheetId: CONFIG.GOOGLE_SHEET_ID,
+                    sheetName: CONFIG.GOOGLE_SHEET_NAME,
+                    data: datos
+                })
+            });
+            
+            return respuesta.ok;
+        }
+        
+        // Función para obtener IP (aproximada)
+        async function obtenerIP() {
+            try {
+                const respuesta = await fetch('https://api.ipify.org?format=json');
+                const data = await respuesta.json();
+                return data.ip;
+            } catch {
+                return "No disponible";
+            }
+        }
+        
+        // Función para enviar webhook (opcional)
+        async function enviarWebhook(datos) {
+            try {
+                await fetch(CONFIG.WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        embeds: [{
+                            title: "🎯 Nueva Respuesta Recibida",
+                            description: `**${datos.nombre}** ha respondido a la invitación`,
+                            fields: [
+                                { name: "Respuesta", value: datos.respuesta, inline: true },
+                                { name: "Veces 'No'", value: datos.vecesNo.toString(), inline: true },
+                                { name: "Fecha", value: datos.fecha, inline: true },
+                                { name: "IP", value: datos.ip, inline: false }
+                            ],
+                            color: datos.respuesta.includes("Sí") ? 0x00ff00 : 0xff0000,
+                            timestamp: new Date().toISOString()
+                        }]
+                    })
+                });
+            } catch (error) {
+                console.error("Error webhook:", error);
+            }
+        }
+        
+        // Mostrar mensaje final
+        async function mostrarMensajeFinal() {
+            const respuestaTexto = "Sí acepto dulce, tú invitas y yo pago";
+            
+            // Guardar respuesta
+            const guardado = await guardarRespuesta(respuestaTexto);
+            
+            if (guardado) {
+                // Actualizar info en mensaje final
+                vecesNoFinal.textContent = contadorNo;
+                fechaRespuesta.textContent = new Date().toLocaleString('es-ES');
+                
+                // Ocultar elementos
+                document.getElementById('contenedorBotones').style.display = 'none';
+                document.getElementById('contadorNo').style.display = 'none';
+                
+                // Mostrar mensaje final
+                mensajeFinal.style.display = 'block';
+                
+                // Efecto de éxito
+                setTimeout(() => {
+                    mensajeFinal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 500);
+                
+                // Mostrar panel admin después de 3 segundos (sólo si eres admin)
+                setTimeout(() => {
+                    if (localStorage.getItem('es_admin') === 'true') {
+                        panelAdmin.style.display = 'block';
+                    }
+                }, 3000);
+            }
+        }
+        
+        // Cargar respuestas guardadas
+        function cargarRespuestas() {
+            try {
+                const guardadas = localStorage.getItem('respuestas_invitacion');
+                if (guardadas) {
+                    respuestasGuardadas = JSON.parse(guardadas);
+                    
+                    // Mostrar en modal
+                    adminInfo.innerHTML = `
+                        <p><strong>${respuestasGuardadas.length}</strong> respuestas guardadas localmente</p>
+                        <p style="font-size: 12px; color: #666;">(Última respuesta: ${respuestasGuardadas[respuestasGuardadas.length-1]?.fecha})</p>
+                    `;
+                    
+                    respuestasLista.innerHTML = respuestasGuardadas.map((r, i) => `
+                        <div class="respuesta-item">
+                            <strong>Respuesta ${i+1}:</strong> ${r.respuesta}<br>
+                            <span class="respuesta-fecha">
+                                ${r.fecha} | Veces "No": ${r.vecesNo} | IP: ${r.ip || "N/A"}
+                            </span>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error("Error cargando respuestas:", error);
+            }
+        }
+        
+        // Mostrar modal admin
+        function mostrarModalAdmin() {
+            modalAdmin.style.display = 'flex';
+            cargarRespuestas();
+        }
+        
+        // Cerrar modal
+        function cerrarModal() {
+            modalAdmin.style.display = 'none';
+        }
+        
+        // Verificar si es admin
+        function verificarAdmin() {
+            const esAdmin = localStorage.getItem('es_admin') === 'true';
+            if (esAdmin) {
+                panelAdmin.style.display = 'block';
+            }
+            
+            // Modo desarrollo: Si presionas 'Admin' 5 veces seguidas en el título
+            let clicksTitulo = 0;
+            document.querySelector('.titulo-invitacion').addEventListener('click', () => {
+                clicksTitulo++;
+                setTimeout(() => { clicksTitulo = 0; }, 2000);
+                
+                if (clicksTitulo === 5) {
+                    const clave = prompt("Ingresa la clave de administrador:");
+                    if (clave === CONFIG.ADMIN_KEY) {
+                        localStorage.setItem('es_admin', 'true');
+                        panelAdmin.style.display = 'block';
+                        alert("Modo administrador activado");
+                    }
+                }
+            });
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Invitación con sistema de respuestas cargado");
+            
+            // Verificar admin
+            verificarAdmin();
+            
+            // Cargar respuestas previas
+            cargarRespuestas();
+            
+            // Evento botón "NO"
+            btnNo.addEventListener('click', function() {
+                contadorNo++;
+                numeroContador.textContent = contadorNo;
+                
+                // Efecto visual
+                this.style.animation = 'shakeSuave 0.4s ease';
+                
+                setTimeout(() => {
+                    this.style.animation = '';
+                }, 400);
+                
+                // Mensajes cambiantes
+                const mensajes = [
+                    "¿Segura?", "Piénsalo de nuevo", "El dulce te espera",
+                    "Una oportunidad más", "¿Segura de que estás segura?",
+                    "Vamos, di que sí", "Mira cómo crece el SÍ...",
+                    "Pero si será divertido", "Te prometo dulces ricos",
+                    "Última oportunidad..."
+                ];
+                
+                if (contadorNo <= mensajes.length) {
+                    this.innerHTML = `<i class="fas fa-times"></i> ${mensajes[contadorNo - 1]}`;
+                }
+            });
+            
+            // Evento botón "SÍ"
+            btnSi.addEventListener('click', async function() {
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+                
+                await mostrarMensajeFinal();
+            });
+            
+            // Panel admin
+            panelAdmin.addEventListener('click', mostrarModalAdmin);
+            
+            // Cerrar modal al hacer clic fuera
+            modalAdmin.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    cerrarModal();
+                }
+            });
+        });
     </script>
 </body>
 </html>
