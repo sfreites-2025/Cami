@@ -272,6 +272,9 @@
             display: none;
             text-align: center;
             padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            margin-top: 20px;
         }
         
         .spinner {
@@ -287,6 +290,26 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        /* NOTIFICACIÓN */
+        .notificacion {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -314,9 +337,12 @@
             <!-- Loading -->
             <div class="loading" id="loading">
                 <div class="spinner"></div>
-                <p>.</p>
+                <p>Guardando respuestas en Google Sheets...</p>
             </div>
         </div>
+        
+        <!-- Notificación -->
+        <div class="notificacion" id="notificacion"></div>
         
         <!-- Panel admin (sólo visible para ti) -->
         <div class="panel-admin" id="panelAdmin">
@@ -347,7 +373,7 @@
 
     <script>
         // =============================================
-        // CONFIGURACIÓN - TU URL DE GOOGLE APPS SCRIPT
+        // CONFIGURACIÓN - URL DE TU GOOGLE APPS SCRIPT
         // =============================================
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0LzC598QjPwEQjsACo8UDfyLgbunQAtzSxiUBkmcucxuvHEpmtdz104S42k3H4TLQeg/exec";
         const ADMIN_KEY = "salomon123"; // Cambia esta clave si quieres
@@ -407,72 +433,103 @@
         const modalAdmin = document.getElementById('modalAdmin');
         const adminInfo = document.getElementById('adminInfo');
         const respuestasLista = document.getElementById('respuestasLista');
+        const notificacion = document.getElementById('notificacion');
         
-        // Función para guardar respuestas en Google Sheets
-        // Función para guardar respuestas en Google Sheets
-async function guardarRespuestasGoogleSheets() {
-    const fecha = new Date();
-    
-    // Obtener IP del usuario
-    let ip = "No disponible";
-    try {
-        const response = await fetch('https://api.ipify.org?format=json');
-        const data = await response.json();
-        ip = data.ip;
-    } catch (error) {
-        console.log("No se pudo obtener la IP");
-    }
-    
-    // Preparar datos para enviar - FORMATO CORREGIDO
-    const datos = {
-        tipo: "preguntas",
-        nombre: "Cami",
-        fecha: fecha.toLocaleString('es-ES'),
-        timestamp: fecha.toISOString(),
-        ip: ip,
-        preguntas: preguntas.map(p => ({
-            pregunta: p.texto,
-            respuesta: p.respuesta,
-            tipo: p.tipo,
-            numero: p.numero
-        }))
-    };
-    
-    try {
-        // Mostrar loading
-        loading.style.display = 'block';
-        
-        // Enviar a Google Sheets
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datos)
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            console.log("Respuestas guardadas en Google Sheets:", result);
+        // Función para mostrar notificación
+        function mostrarNotificacion(mensaje, tipo = 'success') {
+            notificacion.textContent = mensaje;
+            notificacion.style.background = tipo === 'success' ? '#4CAF50' : 
+                                           tipo === 'error' ? '#f44336' : '#2196F3';
+            notificacion.style.display = 'block';
+            
+            setTimeout(() => {
+                notificacion.style.display = 'none';
+            }, 3000);
         }
         
-        // También guardar localmente
-        todasLasRespuestas.push(datos);
-        localStorage.setItem('respuestas_preguntas_cami', JSON.stringify(todasLasRespuestas));
+        // Función para obtener IP
+        async function obtenerIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                console.log("No se pudo obtener la IP");
+                return "No disponible";
+            }
+        }
         
-        return true;
-    } catch (error) {
-        console.error("Error guardando en Google Sheets:", error);
-        
-        // Fallback: guardar solo localmente
-        todasLasRespuestas.push(datos);
-        localStorage.setItem('respuestas_preguntas_cami', JSON.stringify(todasLasRespuestas));
-        
-        return true;
-    } finally {
-        loading.style.display = 'none';
-    }
-}
+        // Función para guardar respuestas en Google Sheets
+        async function guardarRespuestasGoogleSheets() {
+            const fecha = new Date();
+            
+            // Obtener IP
+            const ip = await obtenerIP();
+            
+            // Preparar datos para enviar - FORMATO CORREGIDO
+            const datos = {
+                tipo: "preguntas",
+                nombre: "Cami",
+                fecha: fecha.toLocaleString('es-ES'),
+                timestamp: fecha.toISOString(),
+                ip: ip,
+                preguntas: preguntas.map(p => ({
+                    pregunta: p.texto,
+                    respuesta: p.respuesta || "No respondida",
+                    tipo: p.tipo,
+                    numero: p.numero
+                }))
+            };
+            
+            console.log("Enviando datos a Google Sheets:", datos);
+            
+            try {
+                // Mostrar loading
+                loading.style.display = 'block';
+                
+                // Enviar a Google Sheets
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datos)
+                });
+                
+                console.log("Respuesta del servidor:", response);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log("Google Sheets respondió:", result);
+                    
+                    if (result.success) {
+                        mostrarNotificacion('✅ Respuestas guardadas en Google Sheets', 'success');
+                    } else {
+                        mostrarNotificacion('⚠️ Error guardando en Google Sheets', 'error');
+                    }
+                } else {
+                    console.error("Error HTTP:", response.status);
+                    mostrarNotificacion('⚠️ Error de conexión con Google Sheets', 'error');
+                }
+                
+                // También guardar localmente
+                todasLasRespuestas.push(datos);
+                localStorage.setItem('respuestas_preguntas_cami', JSON.stringify(todasLasRespuestas));
+                
+                return true;
+            } catch (error) {
+                console.error("Error guardando en Google Sheets:", error);
+                mostrarNotificacion('⚠️ Error de conexión', 'error');
+                
+                // Fallback: guardar solo localmente
+                todasLasRespuestas.push(datos);
+                localStorage.setItem('respuestas_preguntas_cami', JSON.stringify(todasLasRespuestas));
+                
+                return true;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
         
         // Función para actualizar progreso
         function actualizarProgreso() {
@@ -598,10 +655,10 @@ async function guardarRespuestasGoogleSheets() {
             const guardado = await guardarRespuestasGoogleSheets();
             
             if (guardado) {
-                // Redirigir a la invitación final después de 1 segundo
+                // Redirigir a la invitación final después de 2 segundos
                 setTimeout(() => {
                     window.location.href = "invitacion.html";
-                }, 1000);
+                }, 2000);
             }
         }
         
@@ -609,8 +666,12 @@ async function guardarRespuestasGoogleSheets() {
         function cargarRespuestasGuardadas() {
             const guardadas = localStorage.getItem('respuestas_preguntas_cami');
             if (guardadas) {
-                todasLasRespuestas = JSON.parse(guardadas);
-                console.log(`${todasLasRespuestas.length} respuestas cargadas`);
+                try {
+                    todasLasRespuestas = JSON.parse(guardadas);
+                    console.log(`${todasLasRespuestas.length} respuestas cargadas de localStorage`);
+                } catch (error) {
+                    console.error("Error parseando localStorage:", error);
+                }
             }
         }
         
@@ -691,6 +752,9 @@ async function guardarRespuestasGoogleSheets() {
         
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
+            console.log("Preguntas cargadas");
+            console.log("URL de Google Apps Script:", GOOGLE_SCRIPT_URL);
+            
             cargarRespuestasGuardadas();
             verificarAdmin();
             mostrarPregunta();
@@ -705,7 +769,11 @@ async function guardarRespuestasGoogleSheets() {
                 }
             });
             
-            console.log("Google Sheets configurado para:", GOOGLE_SCRIPT_URL);
+            // Depuración: Mostrar en consola
+            console.log("Configuración lista:");
+            console.log("- Preguntas:", preguntas.length);
+            console.log("- Google Script:", GOOGLE_SCRIPT_URL);
+            console.log("- Clave Admin:", ADMIN_KEY);
         });
     </script>
 </body>
