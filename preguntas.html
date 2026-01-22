@@ -3,264 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invitación</title>
+    <title>Preguntas para Cami</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#ff6b6b">
     <style>
-        /* ESTILOS SIMPLIFICADOS CON SCROLL */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        html, body {
-            width: 100%;
+        .preguntas-container {
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-x: hidden;
-        }
-        
-        /* ANIMACIONES SUAVES */
-        @keyframes expandirSuave {
-            0% {
-                transform: scale(1);
-                border-radius: 20px;
-            }
-            100% {
-                transform: scale(30);
-                border-radius: 50%;
-                opacity: 0.9;
-                width: 200vw;
-                height: 200vh;
-                left: -50vw !important;
-                top: -50vh !important;
-            }
-        }
-        
-        @keyframes shakeSuave {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-4px); }
-            75% { transform: translateX(4px); }
-        }
-        
-        @keyframes pulseSuave {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.04); }
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes success {
-            0% { transform: scale(0.8); opacity: 0; }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        /* FONDO CON SCROLL */
-        .fondo-invitacion {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-        
-        /* CONTENEDOR PRINCIPAL CON SCROLL */
-        .contenedor-invitacion {
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 25px;
-            padding: 40px 30px;
-            max-width: 650px;
-            width: 90%;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            position: relative;
-            z-index: 2;
-            margin: 20px 0;
-            animation: fadeIn 0.8s ease-out;
-            overflow: visible;
-        }
-        
-        .titulo-invitacion {
-            font-size: 32px;
-            color: #ff6b6b;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-        
-        .subtitulo {
-            font-size: 17px;
-            color: #555;
-            margin-bottom: 25px;
-            line-height: 1.5;
-        }
-        
-        /* PREGUNTA */
-        .pregunta-box {
-            background: linear-gradient(to right, #fff3cd, #ffecb3);
-            border-left: 5px solid #ffc107;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 25px 0;
-            text-align: center;
-        }
-        
-        .titulo-pregunta {
-            color: #856404;
-            margin-bottom: 10px;
-            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
         }
         
-        .texto-pregunta {
-            font-size: 26px;
-            color: #d35400;
-            font-weight: 700;
-            line-height: 1.3;
+        .pregunta-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+            position: relative;
         }
         
-        /* BOTONES */
-        .contenedor-botones {
+        .progreso {
             display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .paso {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 20px;
-            margin: 35px 0;
+            font-weight: bold;
+            color: #666;
+            z-index: 2;
+        }
+        
+        .paso.activo {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .paso.completado {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .linea-progreso {
+            position: absolute;
+            top: 50%;
+            left: 17px;
+            right: 17px;
+            height: 3px;
+            background: #e0e0e0;
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+        
+        .linea-progreso-activa {
+            position: absolute;
+            top: 50%;
+            left: 17px;
+            height: 3px;
+            background: #4CAF50;
+            z-index: 1;
+            transform: translateY(-50%);
+            transition: width 0.5s ease;
+        }
+        
+        .pregunta-texto {
+            font-size: 22px;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        
+        .respuesta-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 25px;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        
+        .respuesta-input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        
+        .opciones {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
         }
         
-        .btn-no {
-            padding: 16px 30px;
-            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 20px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
+        .opcion-btn {
+            flex: 1;
             min-width: 120px;
-            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
-        }
-        
-        .btn-no:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(255, 107, 107, 0.4);
-        }
-        
-        .btn-si {
-            padding: 22px 45px;
-            background: linear-gradient(45deg, #4CAF50, #66bb6a);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 24px;
-            font-weight: 700;
+            padding: 15px 25px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            min-width: 140px;
-            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3);
-            animation: pulseSuave 2s ease-in-out infinite;
-            position: relative;
+            text-align: center;
         }
         
-        .btn-si:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(76, 175, 80, 0.4);
+        .opcion-btn:hover {
+            background: #f0f4ff;
+            transform: translateY(-2px);
         }
         
-        /* CLASE CUANDO EL BOTÓN SÍ SE EXPANDE */
-        .btn-si.expandiendo {
-            animation: expandirSuave 2s ease-in-out forwards !important;
-            z-index: 9999 !important;
-            position: fixed !important;
+        .opcion-btn.seleccionado {
+            background: #667eea;
+            color: white;
         }
         
-        /* CONTADOR */
-        .contador-no {
-            font-size: 16px;
-            color: #ff6b6b;
-            margin: 15px 0 30px 0;
-            font-weight: 600;
+        .btn-siguiente {
+            background: #764ba2;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            float: right;
+        }
+        
+        .btn-siguiente:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .btn-siguiente:hover:not(:disabled) {
+            background: #5a3890;
+            transform: translateY(-2px);
+        }
+        
+        .pregunta-numero {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
         }
         
-        .numero-contador {
-            background: #ff6b6b;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            min-width: 35px;
+        .contador {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f0f4ff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #667eea;
+            font-weight: bold;
         }
         
-        /* MENSAJE FINAL */
-        .mensaje-final {
-            background: #e8f5e9;
-            border: 2px solid #4CAF50;
-            border-radius: 18px;
-            padding: 25px;
-            margin-top: 25px;
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .mensaje-final.centrado {
-            text-align: center;
-            padding: 40px 25px;
-        }
-        
-        .titulo-final {
-            color: #2e7d32;
-            margin-bottom: 15px;
-            font-size: 22px;
-        }
-        
-        /* ICONO DE ÉXITO */
-        .icono-exito {
-            font-size: 60px;
-            color: #4CAF50;
-            margin-bottom: 20px;
-            animation: success 1s ease-out;
-        }
-        
-        /* PANEL ADMIN */
+        /* PANEL ADMIN PARA TÍ */
         .panel-admin {
             position: fixed;
             bottom: 20px;
             left: 20px;
             background: #2196F3;
             color: white;
-            padding: 10px 15px;
+            padding: 8px 15px;
             border-radius: 10px;
-            font-size: 14px;
+            font-size: 12px;
             cursor: pointer;
             z-index: 1000;
             box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
             transition: all 0.3s;
+            display: none;
+            opacity: 0.8;
         }
         
         .panel-admin:hover {
             transform: translateY(-3px);
             background: #1976D2;
+            opacity: 1;
         }
         
         /* MODAL ADMIN */
@@ -279,7 +225,7 @@
         
         .modal-contenido {
             background: white;
-            padding: 30px;
+            padding: 20px;
             border-radius: 15px;
             max-width: 500px;
             width: 90%;
@@ -289,186 +235,86 @@
         
         .modal-titulo {
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: center;
-            font-size: 24px;
-        }
-        
-        .respuestas-lista {
-            margin-top: 20px;
+            font-size: 20px;
         }
         
         .respuesta-item {
             background: #f5f5f5;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
             border-left: 4px solid #4CAF50;
+            font-size: 13px;
         }
         
         .respuesta-fecha {
-            font-size: 12px;
+            font-size: 11px;
             color: #666;
-            margin-top: 5px;
+            margin-top: 4px;
         }
         
-        /* BOTÓN CERRAR */
         .btn-cerrar {
             background: #ff6b6b;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 8px;
             cursor: pointer;
-            margin-top: 20px;
+            margin-top: 15px;
             width: 100%;
-        }
-        
-        /* CRÉDITOS */
-        .creditos {
-            margin-top: 30px;
-            color: #666;
-            font-style: italic;
             font-size: 14px;
-            line-height: 1.5;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
         }
         
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .fondo-invitacion {
-                padding: 10px;
-                align-items: center;
-                min-height: 100vh;
-            }
-            
-            .contenedor-invitacion {
-                padding: 20px 15px;
-                margin: 10px 0;
-                width: 95%;
-            }
-            
-            .titulo-invitacion {
-                font-size: 26px;
-            }
-            
-            .subtitulo {
-                font-size: 16px;
-            }
-            
-            .texto-pregunta {
-                font-size: 22px;
-            }
-            
-            .contenedor-botones {
-                flex-direction: column;
-                align-items: center;
-                gap: 15px;
-            }
-            
-            .btn-no, .btn-si {
-                width: 100%;
-                max-width: 220px;
-                padding: 14px 25px;
-            }
-            
-            .btn-si {
-                font-size: 22px;
-            }
-            
-            .mensaje-final {
-                padding: 20px;
-            }
-            
-            .panel-admin {
-                left: 10px;
-                bottom: 10px;
-                padding: 8px 12px;
-                font-size: 12px;
-            }
+        /* LOADING */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="fondo-invitacion">
-        <div class="contenedor-invitacion">
-            <!-- Elementos decorativos sutiles -->
-            <div class="decoracion" style="top: 15px; left: 15px;">🍭</div>
-            <div class="decoracion" style="top: 15px; right: 15px;">🍬</div>
+    <div class="preguntas-container">
+        <div class="pregunta-box">
+            <div class="contador" id="contador">Pregunta 1 de 5</div>
             
-            <h1 class="titulo-invitacion">
-                <i class="fas fa-heart" style="color:#ff6b6b"></i>
-                ¡Invitación Especial!
-                <i class="fas fa-heart" style="color:#ff6b6b"></i>
-            </h1>
-            
-            <p class="subtitulo">
-                Después de responder todas esas preguntas,<br>
-                llega el momento más importante...
-            </p>
-            
-            <div class="pregunta-box">
-                <h3 class="titulo-pregunta">
-                    <i class="fas fa-candy-cane"></i>
-                    La gran pregunta final:
-                </h3>
-                <p class="texto-pregunta">
-                    ¿Quiere ser invitada a comer dulcito?
-                </p>
+            <!-- Barra de progreso -->
+            <div class="progreso">
+                <div class="linea-progreso"></div>
+                <div class="linea-progreso-activa" id="lineaProgreso"></div>
+                <div class="paso activo" id="paso1">1</div>
+                <div class="paso" id="paso2">2</div>
+                <div class="paso" id="paso3">3</div>
+                <div class="paso" id="paso4">4</div>
+                <div class="paso" id="paso5">5</div>
             </div>
             
-            <div class="contenedor-botones" id="contenedorBotones">
-                <button class="btn-no" id="btnNo">
-                    <i class="fas fa-times"></i> NO
-                </button>
-                
-                <button class="btn-si" id="btnSi">
-                    <i class="fas fa-check"></i> ¡SÍ!
-                </button>
+            <!-- Contenedor de preguntas -->
+            <div id="contenedorPreguntas">
+                <!-- Las preguntas se cargarán dinámicamente aquí -->
             </div>
             
-            <div class="contador-no" id="contadorNo">
-                <i class="fas fa-times-circle"></i>
-                Veces que has dicho "No": 
-                <span class="numero-contador" id="numeroContador">0</span>
-            </div>
-            
-            <!-- Mensaje final mejorado -->
-            <div class="mensaje-final centrado" id="mensajeFinal">
-                <div class="icono-exito">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                
-                <h3 class="titulo-final">
-                    ¡Respuesta guardada exitosamente! 🎉
-                </h3>
-                
-                <p style="margin-bottom: 15px; color: #555;">
-                    <strong>Tu respuesta ha sido registrada:</strong><br>
-                    "Sí acepto dulce, tú invitas y yo pago"
-                </p>
-                
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0;">
-                    <p style="font-weight: bold; color: #2e7d32; margin-bottom: 5px;">
-                        <i class="fas fa-info-circle"></i> Información registrada:
-                    </p>
-                    <p style="font-size: 14px; color: #666;">
-                        • Respuesta: <strong>Aceptado ✅</strong><br>
-                        • Veces "No" antes de aceptar: <strong id="vecesNoFinal">0</strong><br>
-                        • Fecha y hora: <strong id="fechaRespuesta"></strong>
-                    </p>
-                </div>
-                
-                <p style="font-style: italic; color: #888; margin-top: 20px;">
-                    Salomón recibió tu respuesta y pronto se pondrá en contacto contigo. ¡Gracias! 🍬
-                </p>
-            </div>
-            
-            <div class="creditos">
-                Creado especialmente para ti Cami (Que no se note lo aburrido. PD: No le había hecho esto a nadie, espero le guste)
-                <br>
-                <small style="color: #999;">— Salomón</small>
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Guardando respuestas en Google Sheets...</p>
             </div>
         </div>
         
@@ -481,14 +327,14 @@
         <div class="modal-admin" id="modalAdmin">
             <div class="modal-contenido">
                 <h3 class="modal-titulo">
-                    <i class="fas fa-database"></i> Respuestas Registradas
+                    <i class="fas fa-database"></i> Respuestas de Cami
                 </h3>
                 
-                <div id="adminInfo" style="text-align: center; margin-bottom: 20px;">
+                <div id="adminInfo" style="text-align: center; margin-bottom: 15px; font-size: 14px;">
                     <p>Cargando respuestas...</p>
                 </div>
                 
-                <div class="respuestas-lista" id="respuestasLista">
+                <div id="respuestasLista">
                     <!-- Aquí se cargarán las respuestas -->
                 </div>
                 
@@ -501,194 +347,311 @@
 
     <script>
         // =============================================
-        // CONFIGURACIÓN - REEMPLAZA CON TU INFORMACIÓN
+        // CONFIGURACIÓN - TU URL DE GOOGLE APPS SCRIPT
         // =============================================
-        const CONFIG = {
-            // Tu Google Sheets (para guardar respuestas)
-            GOOGLE_SHEET_ID: "https://script.google.com/macros/s/AKfycbw0LzC598QjPwEQjsACo8UDfyLgbunQAtzSxiUBkmcucxuvHEpmtdz104S42k3H4TLQeg/exec",
-            GOOGLE_SHEET_NAME: "Respuestas",
-            
-            // Clave secreta para ver respuestas (cámbiala)
-            ADMIN_KEY: "salomon123",
-            
-            // Opcional: Webhook para notificarte
-            WEBHOOK_URL: "TU_WEBHOOK_OPCIONAL"
-        };
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0LzC598QjPwEQjsACo8UDfyLgbunQAtzSxiUBkmcucxuvHEpmtdz104S42k3H4TLQeg/exec";
+        const ADMIN_KEY = "salomon123"; // Cambia esta clave si quieres
         // =============================================
         
-        // Variables
-        let contadorNo = 0;
-        let respuestasGuardadas = [];
+        // Array de preguntas
+        const preguntas = [
+            {
+                id: 1,
+                texto: "¿Qué te ha parecido hasta los momentos mi existencia en tu vida?",
+                tipo: "texto",
+                respuesta: "",
+                numero: 1
+            },
+            {
+                id: 2,
+                texto: "¿Me vas a terminar de pasar tu Curriculum algún día?",
+                tipo: "si_no",
+                opciones: ["Sí", "No"],
+                respuesta: "",
+                numero: 2
+            },
+            {
+                id: 3,
+                texto: "¿Algún día veré el casting?",
+                tipo: "si_no",
+                opciones: ["Sí", "No"],
+                respuesta: "",
+                numero: 3
+            },
+            {
+                id: 4,
+                texto: "¿Cuándo me invitas a una colaboración en TikTok?",
+                tipo: "texto",
+                respuesta: "",
+                numero: 4
+            },
+            {
+                id: 5,
+                texto: "¿Me vas a explicar química?",
+                tipo: "si_no",
+                opciones: ["Sí", "No"],
+                respuesta: "",
+                numero: 5
+            }
+        ];
         
-        // Elementos del DOM
-        const btnSi = document.getElementById('btnSi');
-        const btnNo = document.getElementById('btnNo');
-        const mensajeFinal = document.getElementById('mensajeFinal');
-        const numeroContador = document.getElementById('numeroContador');
+        let preguntaActual = 0;
+        let todasLasRespuestas = [];
+        
+        // Elementos DOM
+        const contenedorPreguntas = document.getElementById('contenedorPreguntas');
+        const contador = document.getElementById('contador');
+        const lineaProgreso = document.getElementById('lineaProgreso');
+        const loading = document.getElementById('loading');
         const panelAdmin = document.getElementById('panelAdmin');
         const modalAdmin = document.getElementById('modalAdmin');
-        const respuestasLista = document.getElementById('respuestasLista');
         const adminInfo = document.getElementById('adminInfo');
-        const vecesNoFinal = document.getElementById('vecesNoFinal');
-        const fechaRespuesta = document.getElementById('fechaRespuesta');
+        const respuestasLista = document.getElementById('respuestasLista');
         
-        // Función para guardar respuesta en Google Sheets
-        async function guardarRespuesta(respuesta) {
+        // Función para guardar respuestas en Google Sheets
+        async function guardarRespuestasGoogleSheets() {
             const fecha = new Date();
+            
+            // Obtener IP del usuario
+            let ip = "No disponible";
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                ip = data.ip;
+            } catch (error) {
+                console.log("No se pudo obtener la IP");
+            }
+            
+            // Preparar datos para enviar
             const datos = {
                 nombre: "Cami",
-                respuesta: respuesta,
-                vecesNo: contadorNo,
                 fecha: fecha.toLocaleString('es-ES'),
                 timestamp: fecha.toISOString(),
-                ip: await obtenerIP()
+                ip: ip,
+                preguntas: preguntas.map(p => ({
+                    pregunta: p.texto,
+                    respuesta: p.respuesta,
+                    tipo: p.tipo,
+                    numero: p.numero
+                }))
             };
             
             try {
-                // Método 1: Guardar en localStorage (fallback)
-                respuestasGuardadas.push(datos);
-                localStorage.setItem('respuestas_invitacion', JSON.stringify(respuestasGuardadas));
+                // Mostrar loading
+                loading.style.display = 'block';
                 
-                // Método 2: Enviar a Google Sheets (si está configurado)
-                if (CONFIG.GOOGLE_SHEET_ID !== "TU_ID_DE_GOOGLE_SHEETS") {
-                    await enviarAGoogleSheets(datos);
-                }
-                
-                // Método 3: Enviar notificación por webhook (opcional)
-                if (CONFIG.WEBHOOK_URL && CONFIG.WEBHOOK_URL !== "TU_WEBHOOK_OPCIONAL") {
-                    await enviarWebhook(datos);
-                }
-                
-                return true;
-            } catch (error) {
-                console.error("Error al guardar:", error);
-                // Si falla, al menos guarda en localStorage
-                return true;
-            }
-        }
-        
-        // Función para enviar datos a Google Sheets
-        async function enviarAGoogleSheets(datos) {
-            const url = `https://script.google.com/macros/s/AKfycbxYJjM2JX7Q0Xq7Z8Q3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ3ZQ/exec`;
-            
-            const respuesta = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    sheetId: CONFIG.GOOGLE_SHEET_ID,
-                    sheetName: CONFIG.GOOGLE_SHEET_NAME,
-                    data: datos
-                })
-            });
-            
-            return respuesta.ok;
-        }
-        
-        // Función para obtener IP (aproximada)
-        async function obtenerIP() {
-            try {
-                const respuesta = await fetch('https://api.ipify.org?format=json');
-                const data = await respuesta.json();
-                return data.ip;
-            } catch {
-                return "No disponible";
-            }
-        }
-        
-        // Función para enviar webhook (opcional)
-        async function enviarWebhook(datos) {
-            try {
-                await fetch(CONFIG.WEBHOOK_URL, {
+                // Enviar a Google Sheets
+                await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors', // Importante para Google Apps Script
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        embeds: [{
-                            title: "🎯 Nueva Respuesta Recibida",
-                            description: `**${datos.nombre}** ha respondido a la invitación`,
-                            fields: [
-                                { name: "Respuesta", value: datos.respuesta, inline: true },
-                                { name: "Veces 'No'", value: datos.vecesNo.toString(), inline: true },
-                                { name: "Fecha", value: datos.fecha, inline: true },
-                                { name: "IP", value: datos.ip, inline: false }
-                            ],
-                            color: datos.respuesta.includes("Sí") ? 0x00ff00 : 0xff0000,
-                            timestamp: new Date().toISOString()
-                        }]
-                    })
+                    body: JSON.stringify(datos)
                 });
+                
+                console.log("Respuestas guardadas en Google Sheets");
+                
+                // También guardar localmente
+                todasLasRespuestas.push(datos);
+                localStorage.setItem('respuestas_preguntas_cami', JSON.stringify(todasLasRespuestas));
+                
+                return true;
             } catch (error) {
-                console.error("Error webhook:", error);
+                console.error("Error guardando en Google Sheets:", error);
+                
+                // Fallback: guardar solo localmente
+                todasLasRespuestas.push(datos);
+                localStorage.setItem('respuestas_preguntas_cami', JSON.stringify(todasLasRespuestas));
+                
+                return true; // Aceptamos el fallback
+            } finally {
+                loading.style.display = 'none';
             }
         }
         
-        // Mostrar mensaje final
-        async function mostrarMensajeFinal() {
-            const respuestaTexto = "Sí acepto dulce, tú invitas y yo pago";
+        // Función para actualizar progreso
+        function actualizarProgreso() {
+            const porcentaje = (preguntaActual / (preguntas.length - 1)) * 100;
+            lineaProgreso.style.width = `${porcentaje}%`;
             
-            // Guardar respuesta
-            const guardado = await guardarRespuesta(respuestaTexto);
+            // Actualizar pasos
+            for (let i = 1; i <= preguntas.length; i++) {
+                const paso = document.getElementById(`paso${i}`);
+                if (i - 1 < preguntaActual) {
+                    paso.className = 'paso completado';
+                } else if (i - 1 === preguntaActual) {
+                    paso.className = 'paso activo';
+                } else {
+                    paso.className = 'paso';
+                }
+            }
+            
+            contador.textContent = `Pregunta ${preguntaActual + 1} de ${preguntas.length}`;
+        }
+        
+        // Función para mostrar pregunta actual
+        function mostrarPregunta() {
+            const pregunta = preguntas[preguntaActual];
+            
+            let html = `
+                <div class="pregunta-numero">
+                    <i class="fas fa-question-circle"></i>
+                    Pregunta #${pregunta.numero}
+                </div>
+                <div class="pregunta-texto">${pregunta.texto}</div>
+            `;
+            
+            if (pregunta.tipo === 'texto') {
+                html += `
+                    <textarea class="respuesta-input" 
+                              id="respuestaTexto" 
+                              placeholder="Escribe tu respuesta aquí, porfavor y gracias"
+                              oninput="guardarRespuestaTexto(this.value)">${pregunta.respuesta || ''}</textarea>
+                `;
+            } else if (pregunta.tipo === 'si_no') {
+                html += `
+                    <div class="opciones">
+                        ${pregunta.opciones.map(opcion => `
+                            <button class="opcion-btn ${pregunta.respuesta === opcion ? 'seleccionado' : ''}"
+                                    onclick="seleccionarOpcion('${opcion}')">
+                                ${opcion}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            html += `
+                <div style="clear: both; padding-top: 20px;">
+                    ${preguntaActual > 0 ? `
+                        <button class="btn-siguiente" onclick="preguntaAnterior()" style="float: left; background: #666;">
+                            <i class="fas fa-arrow-left"></i> Anterior
+                        </button>
+                    ` : ''}
+                    
+                    <button class="btn-siguiente" id="btnSiguiente" 
+                            onclick="${preguntaActual === preguntas.length - 1 ? 'finalizarPreguntas()' : 'siguientePregunta()'}"
+                            ${!pregunta.respuesta ? 'disabled' : ''}>
+                        ${preguntaActual === preguntas.length - 1 ? 'Finalizar' : 'Siguiente'}
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            `;
+            
+            contenedorPreguntas.innerHTML = html;
+            actualizarProgreso();
+        }
+        
+        // Funciones para manejar respuestas
+        function guardarRespuestaTexto(valor) {
+            preguntas[preguntaActual].respuesta = valor.trim();
+            document.getElementById('btnSiguiente').disabled = !valor.trim();
+        }
+        
+        function seleccionarOpcion(opcion) {
+            preguntas[preguntaActual].respuesta = opcion;
+            
+            // Actualizar botones
+            document.querySelectorAll('.opcion-btn').forEach(btn => {
+                btn.classList.remove('seleccionado');
+                if (btn.textContent.trim() === opcion) {
+                    btn.classList.add('seleccionado');
+                }
+            });
+            
+            document.getElementById('btnSiguiente').disabled = false;
+        }
+        
+        // Navegación entre preguntas
+        function siguientePregunta() {
+            if (preguntaActual < preguntas.length - 1) {
+                preguntaActual++;
+                mostrarPregunta();
+            }
+        }
+        
+        function preguntaAnterior() {
+            if (preguntaActual > 0) {
+                preguntaActual--;
+                mostrarPregunta();
+            }
+        }
+        
+        // Función para finalizar preguntas
+        async function finalizarPreguntas() {
+            // Verificar que todas estén respondidas
+            const sinResponder = preguntas.filter(p => !p.respuesta);
+            
+            if (sinResponder.length > 0) {
+                alert('Por favor, responde todas las preguntas antes de finalizar.');
+                preguntaActual = sinResponder[0].numero - 1;
+                mostrarPregunta();
+                return;
+            }
+            
+            // Guardar en Google Sheets
+            const guardado = await guardarRespuestasGoogleSheets();
             
             if (guardado) {
-                // Actualizar info en mensaje final
-                vecesNoFinal.textContent = contadorNo;
-                fechaRespuesta.textContent = new Date().toLocaleString('es-ES');
-                
-                // Ocultar elementos
-                document.getElementById('contenedorBotones').style.display = 'none';
-                document.getElementById('contadorNo').style.display = 'none';
-                
-                // Mostrar mensaje final
-                mensajeFinal.style.display = 'block';
-                
-                // Efecto de éxito
+                // Redirigir a la invitación final después de 1 segundo
                 setTimeout(() => {
-                    mensajeFinal.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 500);
-                
-                // Mostrar panel admin después de 3 segundos (sólo si eres admin)
-                setTimeout(() => {
-                    if (localStorage.getItem('es_admin') === 'true') {
-                        panelAdmin.style.display = 'block';
-                    }
-                }, 3000);
+                    window.location.href = "invitacion.html";
+                }, 1000);
             }
         }
         
-        // Cargar respuestas guardadas
-        function cargarRespuestas() {
+        // Cargar respuestas guardadas (si las hay)
+        function cargarRespuestasGuardadas() {
+            const guardadas = localStorage.getItem('respuestas_preguntas_cami');
+            if (guardadas) {
+                todasLasRespuestas = JSON.parse(guardadas);
+                console.log(`${todasLasRespuestas.length} respuestas cargadas`);
+            }
+        }
+        
+        // Cargar y mostrar respuestas en el panel admin
+        function cargarRespuestasPanel() {
             try {
-                const guardadas = localStorage.getItem('respuestas_invitacion');
+                const guardadas = localStorage.getItem('respuestas_preguntas_cami');
                 if (guardadas) {
-                    respuestasGuardadas = JSON.parse(guardadas);
+                    todasLasRespuestas = JSON.parse(guardadas);
                     
-                    // Mostrar en modal
                     adminInfo.innerHTML = `
-                        <p><strong>${respuestasGuardadas.length}</strong> respuestas guardadas localmente</p>
-                        <p style="font-size: 12px; color: #666;">(Última respuesta: ${respuestasGuardadas[respuestasGuardadas.length-1]?.fecha})</p>
+                        <p><strong>${todasLasRespuestas.length}</strong> sesiones de preguntas completadas</p>
+                        <p style="font-size: 12px; color: #666;">(Última: ${todasLasRespuestas[todasLasRespuestas.length-1]?.fecha})</p>
                     `;
                     
-                    respuestasLista.innerHTML = respuestasGuardadas.map((r, i) => `
-                        <div class="respuesta-item">
-                            <strong>Respuesta ${i+1}:</strong> ${r.respuesta}<br>
-                            <span class="respuesta-fecha">
-                                ${r.fecha} | Veces "No": ${r.vecesNo} | IP: ${r.ip || "N/A"}
-                            </span>
-                        </div>
-                    `).join('');
+                    if (todasLasRespuestas.length > 0) {
+                        const ultimaSesion = todasLasRespuestas[todasLasRespuestas.length - 1];
+                        
+                        let html = '<h4 style="margin: 15px 0 10px 0; color: #333;">Últimas respuestas:</h4>';
+                        
+                        ultimaSesion.preguntas.forEach((pregunta, i) => {
+                            html += `
+                                <div class="respuesta-item">
+                                    <strong>P${i+1}:</strong> ${pregunta.pregunta}<br>
+                                    <strong>Respuesta:</strong> ${pregunta.respuesta}<br>
+                                    <span class="respuesta-fecha">${ultimaSesion.fecha} | IP: ${ultimaSesion.ip}</span>
+                                </div>
+                            `;
+                        });
+                        
+                        respuestasLista.innerHTML = html;
+                    }
+                } else {
+                    adminInfo.innerHTML = '<p>No hay respuestas guardadas todavía</p>';
                 }
             } catch (error) {
                 console.error("Error cargando respuestas:", error);
+                adminInfo.innerHTML = '<p>Error cargando respuestas</p>';
             }
         }
         
         // Mostrar modal admin
         function mostrarModalAdmin() {
             modalAdmin.style.display = 'flex';
-            cargarRespuestas();
+            cargarRespuestasPanel();
         }
         
         // Cerrar modal
@@ -698,23 +661,25 @@
         
         // Verificar si es admin
         function verificarAdmin() {
-            const esAdmin = localStorage.getItem('es_admin') === 'true';
+            const esAdmin = localStorage.getItem('es_admin_preguntas') === 'true';
             if (esAdmin) {
                 panelAdmin.style.display = 'block';
             }
             
-            // Modo desarrollo: Si presionas 'Admin' 5 veces seguidas en el título
+            // Modo secreto: Si presionas 5 veces seguidas el título
             let clicksTitulo = 0;
-            document.querySelector('.titulo-invitacion').addEventListener('click', () => {
-                clicksTitulo++;
-                setTimeout(() => { clicksTitulo = 0; }, 2000);
-                
-                if (clicksTitulo === 5) {
-                    const clave = prompt("Ingresa la clave de administrador:");
-                    if (clave === CONFIG.ADMIN_KEY) {
-                        localStorage.setItem('es_admin', 'true');
-                        panelAdmin.style.display = 'block';
-                        alert("Modo administrador activado");
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.pregunta-texto') || e.target.closest('.pregunta-numero')) {
+                    clicksTitulo++;
+                    setTimeout(() => { clicksTitulo = 0; }, 2000);
+                    
+                    if (clicksTitulo === 5) {
+                        const clave = prompt("Ingresa la clave de administrador:");
+                        if (clave === ADMIN_KEY) {
+                            localStorage.setItem('es_admin_preguntas', 'true');
+                            panelAdmin.style.display = 'block';
+                            alert("Modo administrador activado ✓");
+                        }
                     }
                 }
             });
@@ -722,47 +687,9 @@
         
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
-            console.log("Invitación con sistema de respuestas cargado");
-            
-            // Verificar admin
+            cargarRespuestasGuardadas();
             verificarAdmin();
-            
-            // Cargar respuestas previas
-            cargarRespuestas();
-            
-            // Evento botón "NO"
-            btnNo.addEventListener('click', function() {
-                contadorNo++;
-                numeroContador.textContent = contadorNo;
-                
-                // Efecto visual
-                this.style.animation = 'shakeSuave 0.4s ease';
-                
-                setTimeout(() => {
-                    this.style.animation = '';
-                }, 400);
-                
-                // Mensajes cambiantes
-                const mensajes = [
-                    "¿Segura?", "Piénsalo de nuevo", "El dulce te espera",
-                    "Una oportunidad más", "¿Segura de que estás segura?",
-                    "Vamos, di que sí", "Mira cómo crece el SÍ...",
-                    "Pero si será divertido", "Te prometo dulces ricos",
-                    "Última oportunidad..."
-                ];
-                
-                if (contadorNo <= mensajes.length) {
-                    this.innerHTML = `<i class="fas fa-times"></i> ${mensajes[contadorNo - 1]}`;
-                }
-            });
-            
-            // Evento botón "SÍ"
-            btnSi.addEventListener('click', async function() {
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-                
-                await mostrarMensajeFinal();
-            });
+            mostrarPregunta();
             
             // Panel admin
             panelAdmin.addEventListener('click', mostrarModalAdmin);
@@ -773,6 +700,8 @@
                     cerrarModal();
                 }
             });
+            
+            console.log("Google Sheets configurado para:", GOOGLE_SCRIPT_URL);
         });
     </script>
 </body>
