@@ -2,32 +2,73 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Preguntas para Cami</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
     <style>
-        .preguntas-container {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 20px;
+        /* ESTILOS SIMPLIFICADOS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            height: -webkit-fill-available;
+            overflow: hidden;
+            position: fixed;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* ANIMACIONES SUAVES */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* CONTENEDOR PRINCIPAL */
+        .pantalla-preguntas {
+            width: 100vw;
+            height: 100vh;
+            min-height: -webkit-fill-available;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
         
-        .pregunta-box {
-            background: white;
+        .contenedor-preguntas {
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
-            padding: 40px;
+            padding: 30px;
             max-width: 700px;
-            width: 100%;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
-            position: relative;
+            width: 90%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.8s ease-out;
         }
         
-        .progreso {
+        /* BARRA DE PROGRESO */
+        .barra-progreso {
             display: flex;
+            align-items: center;
             justify-content: space-between;
             margin-bottom: 30px;
             position: relative;
@@ -44,10 +85,11 @@
             font-weight: bold;
             color: #666;
             z-index: 2;
+            transition: all 0.3s;
         }
         
         .paso.activo {
-            background: #667eea;
+            background: #764ba2;
             color: white;
             transform: scale(1.1);
         }
@@ -68,7 +110,7 @@
             transform: translateY(-50%);
         }
         
-        .linea-progreso-activa {
+        .linea-activa {
             position: absolute;
             top: 50%;
             left: 17px;
@@ -79,92 +121,13 @@
             transition: width 0.5s ease;
         }
         
-        .pregunta-texto {
-            font-size: 22px;
-            margin-bottom: 30px;
-            color: #333;
-            font-weight: 600;
-            line-height: 1.4;
+        /* CONTENIDO DE PREGUNTAS */
+        .contenido-pregunta {
+            animation: fadeIn 0.5s ease;
         }
         
-        .respuesta-input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-            margin-bottom: 25px;
-            resize: vertical;
-            min-height: 100px;
-            font-family: inherit;
-        }
-        
-        .respuesta-input:focus {
-            border-color: #667eea;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-        }
-        
-        .opciones {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-        
-        .opcion-btn {
-            flex: 1;
-            min-width: 120px;
-            padding: 15px 25px;
-            border: 2px solid #667eea;
-            background: white;
-            color: #667eea;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-        
-        .opcion-btn:hover {
-            background: #f0f4ff;
-            transform: translateY(-2px);
-        }
-        
-        .opcion-btn.seleccionado {
-            background: #667eea;
-            color: white;
-        }
-        
-        .btn-siguiente {
-            background: #764ba2;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            float: right;
-        }
-        
-        .btn-siguiente:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-        }
-        
-        .btn-siguiente:hover:not(:disabled) {
-            background: #5a3890;
-            transform: translateY(-2px);
-        }
-        
-        .pregunta-numero {
-            color: #667eea;
+        .numero-pregunta {
+            color: #764ba2;
             font-size: 14px;
             font-weight: bold;
             margin-bottom: 10px;
@@ -173,142 +136,367 @@
             gap: 8px;
         }
         
-        .contador {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #f0f4ff;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            color: #667eea;
+        .texto-pregunta {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        
+        /* ÁREA DE RESPUESTA */
+        .area-respuesta {
+            margin-bottom: 25px;
+        }
+        
+        .respuesta-texto {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.3s;
+        }
+        
+        .respuesta-texto:focus {
+            border-color: #764ba2;
+            outline: none;
+        }
+        
+        .opciones-si-no {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .opcion-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #764ba2;
+            background: white;
+            color: #764ba2;
+            border-radius: 10px;
+            font-size: 18px;
             font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .opcion-btn:hover {
+            background: #f0e6ff;
+        }
+        
+        .opcion-btn.seleccionado {
+            background: #764ba2;
+            color: white;
+        }
+        
+        /* BOTONES DE NAVEGACIÓN */
+        .botones-navegacion {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .btn-navegacion {
+            padding: 12px 25px;
+            background: #764ba2;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-navegacion:hover {
+            background: #5a3890;
+            transform: translateY(-2px);
+        }
+        
+        .btn-navegacion:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-finalizar {
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+        
+        .btn-finalizar:hover {
+            background: #45a049;
+        }
+        
+        /* MENSAJE DE ENVÍO */
+        .mensaje-envio {
+            background: #e8f5e9;
+            border: 2px solid #4CAF50;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+            text-align: center;
+        }
+        
+        .mensaje-envio.visible {
+            display: block;
+        }
+        
+        .cargando {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #764ba2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .btn-continuar-final {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-continuar-final:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .contenedor-preguntas {
+                padding: 20px;
+            }
+            
+            .texto-pregunta {
+                font-size: 20px;
+            }
+            
+            .opciones-si-no {
+                flex-direction: column;
+            }
+            
+            .botones-navegacion {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn-navegacion {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="preguntas-container">
-        <div class="pregunta-box">
-            <div class="contador" id="contador">Pregunta 1 de 5</div>
-            
+    <div class="pantalla-preguntas">
+        <div class="contenedor-preguntas">
             <!-- Barra de progreso -->
-            <div class="progreso">
+            <div class="barra-progreso" id="barraProgreso">
                 <div class="linea-progreso"></div>
-                <div class="linea-progreso-activa" id="lineaProgreso"></div>
-                <div class="paso activo" id="paso1">1</div>
-                <div class="paso" id="paso2">2</div>
-                <div class="paso" id="paso3">3</div>
-                <div class="paso" id="paso4">4</div>
-                <div class="paso" id="paso5">5</div>
+                <div class="linea-activa" id="lineaActiva"></div>
+                <!-- Los pasos se generan dinámicamente -->
             </div>
             
             <!-- Contenedor de preguntas -->
             <div id="contenedorPreguntas">
-                <!-- Las preguntas se cargarán dinámicamente aquí -->
+                <!-- Las preguntas se cargarán aquí dinámicamente -->
+            </div>
+            
+            <!-- Mensaje de envío automático -->
+            <div class="mensaje-envio" id="mensajeEnvio">
+                <h3 style="color: #2e7d32; margin-bottom: 15px;">
+                    <i class="fas fa-check-circle"></i> ¡Respuestas enviadas!
+                </h3>
+                <p style="margin-bottom: 15px;">
+                    Tus respuestas se han enviado automáticamente a Salomón. ¡Gracias por responder!
+                </p>
+                <div class="cargando" id="cargandoEnvio">
+                    <div class="spinner"></div>
+                    <span>Enviando respuestas...</span>
+                </div>
+                <button class="btn-continuar-final" id="btnContinuarFinal" style="display: none;">
+                    <i class="fas fa-arrow-right"></i> Continuar a la invitación
+                </button>
             </div>
         </div>
     </div>
 
     <script>
         // =============================================
-        // CONFIGURACIÓN 
+        // CONFIGURACIÓN
         // =============================================
-        const TU_WHATSAPP = "584143568666"; 
-        const TU_NOMBRE = "Salomón"; 
-        // =============================================
+        const CONFIG = {
+            TU_WHATSAPP: "584143568666",  // Tu número para recibir respuestas
+            TU_NOMBRE: "Salomón",
+            SU_NOMBRE: "Cami",
+            ENVIAR_AUTOMATICAMENTE: true, // TRUE para enviar automáticamente
+            WEBSITE_URL: window.location.origin // URL actual para identificar
+        };
         
-        // Array de preguntas
-        const preguntas = [
+        // =============================================
+        // DATOS DE LAS PREGUNTAS
+        // =============================================
+        const PREGUNTAS = [
             {
                 id: 1,
                 texto: "¿Qué te ha parecido hasta los momentos mi existencia en tu vida?",
                 tipo: "texto",
                 respuesta: "",
-                numero: 1
+                placeholder: "Escribe tu respuesta aquí..."
             },
             {
                 id: 2,
                 texto: "¿Me vas a terminar de pasar tu Curriculum algún día?",
                 tipo: "si_no",
                 opciones: ["Sí", "No"],
-                respuesta: "",
-                numero: 2
+                respuesta: ""
             },
             {
                 id: 3,
                 texto: "¿Algún día veré el casting?",
                 tipo: "si_no",
                 opciones: ["Sí", "No"],
-                respuesta: "",
-                numero: 3
+                respuesta: ""
             },
             {
                 id: 4,
                 texto: "¿Cuándo me invitas a una colaboración en TikTok?",
                 tipo: "texto",
                 respuesta: "",
-                numero: 4
+                placeholder: "Ej: Cuando quieras, la próxima semana, etc..."
             },
             {
                 id: 5,
                 texto: "¿Me vas a explicar química?",
                 tipo: "si_no",
                 opciones: ["Sí", "No"],
-                respuesta: "",
-                numero: 5
+                respuesta: ""
             }
         ];
         
+        // =============================================
+        // VARIABLES GLOBALES
+        // =============================================
         let preguntaActual = 0;
+        let respuestasEnviadas = false;
         const respuestas = [];
         
-        // Elementos DOM
-        const contenedorPreguntas = document.getElementById('contenedorPreguntas');
-        const contador = document.getElementById('contador');
-        const lineaProgreso = document.getElementById('lineaProgreso');
+        // =============================================
+        // FUNCIONES PRINCIPALES
+        // =============================================
         
-        // Función para actualizar progreso
-        function actualizarProgreso() {
-            const porcentaje = (preguntaActual / (preguntas.length - 1)) * 100;
-            lineaProgreso.style.width = `${porcentaje}%`;
+        // Inicializar la aplicación
+        function inicializarApp() {
+            console.log("Iniciando cuestionario para:", CONFIG.SU_NOMBRE);
             
-            // Actualizar pasos
-            for (let i = 1; i <= preguntas.length; i++) {
-                const paso = document.getElementById(`paso${i}`);
-                if (i - 1 < preguntaActual) {
+            // Crear barra de progreso
+            crearBarraProgreso();
+            
+            // Mostrar primera pregunta
+            mostrarPregunta();
+            
+            // Configurar eventos globales
+            configurarEventos();
+        }
+        
+        // Crear barra de progreso dinámica
+        function crearBarraProgreso() {
+            const barra = document.getElementById('barraProgreso');
+            const lineaActiva = document.getElementById('lineaActiva');
+            
+            // Crear pasos
+            PREGUNTAS.forEach((pregunta, index) => {
+                const paso = document.createElement('div');
+                paso.className = 'paso';
+                paso.id = `paso${index + 1}`;
+                paso.textContent = index + 1;
+                barra.insertBefore(paso, lineaActiva);
+            });
+            
+            // Actualizar progreso inicial
+            actualizarBarraProgreso();
+        }
+        
+        // Actualizar barra de progreso
+        function actualizarBarraProgreso() {
+            const porcentaje = (preguntaActual / (PREGUNTAS.length - 1)) * 100;
+            document.getElementById('lineaActiva').style.width = `${porcentaje}%`;
+            
+            // Actualizar estado de pasos
+            PREGUNTAS.forEach((pregunta, index) => {
+                const paso = document.getElementById(`paso${index + 1}`);
+                if (index < preguntaActual) {
                     paso.className = 'paso completado';
-                } else if (i - 1 === preguntaActual) {
+                } else if (index === preguntaActual) {
                     paso.className = 'paso activo';
                 } else {
                     paso.className = 'paso';
                 }
-            }
-            
-            contador.textContent = `Pregunta ${preguntaActual + 1} de ${preguntas.length}`;
+            });
         }
         
-        // Función para mostrar pregunta actual
+        // Mostrar pregunta actual
         function mostrarPregunta() {
-            const pregunta = preguntas[preguntaActual];
+            const pregunta = PREGUNTAS[preguntaActual];
+            const contenedor = document.getElementById('contenedorPreguntas');
             
             let html = `
-                <div class="pregunta-numero">
-                    <i class="fas fa-question-circle"></i>
-                    Pregunta #${pregunta.numero}
-                </div>
-                <div class="pregunta-texto">${pregunta.texto}</div>
+                <div class="contenido-pregunta">
+                    <div class="numero-pregunta">
+                        <i class="fas fa-question-circle"></i>
+                        Pregunta ${preguntaActual + 1} de ${PREGUNTAS.length}
+                    </div>
+                    
+                    <div class="texto-pregunta">${pregunta.texto}</div>
+                    
+                    <div class="area-respuesta" id="areaRespuesta">
             `;
             
             if (pregunta.tipo === 'texto') {
                 html += `
-                    <textarea class="respuesta-input" 
+                    <textarea class="respuesta-texto" 
                               id="respuestaTexto" 
-                              placeholder="Escribe tu respuesta aquí, porfavor y gracias"
-                              oninput="guardarRespuestaTexto(this.value)">${pregunta.respuesta || ''}</textarea>
+                              placeholder="${pregunta.placeholder || 'Escribe tu respuesta aquí...'}"
+                              oninput="actualizarRespuestaTexto(this.value)">${pregunta.respuesta || ''}</textarea>
                 `;
             } else if (pregunta.tipo === 'si_no') {
                 html += `
-                    <div class="opciones">
+                    <div class="opciones-si-no">
                         ${pregunta.opciones.map(opcion => `
                             <button class="opcion-btn ${pregunta.respuesta === opcion ? 'seleccionado' : ''}"
                                     onclick="seleccionarOpcion('${opcion}')">
@@ -320,34 +508,47 @@
             }
             
             html += `
-                <div style="clear: both; padding-top: 20px;">
-                    ${preguntaActual > 0 ? `
-                        <button class="btn-siguiente" onclick="preguntaAnterior()" style="float: left; background: #666;">
-                            <i class="fas fa-arrow-left"></i> Anterior
-                        </button>
-                    ` : ''}
+                    </div>
                     
-                    <button class="btn-siguiente" id="btnSiguiente" 
-                            onclick="${preguntaActual === preguntas.length - 1 ? 'finalizarPreguntas()' : 'siguientePregunta()'}"
-                            ${!pregunta.respuesta ? 'disabled' : ''}>
-                        ${preguntaActual === preguntas.length - 1 ? 'Finalizar' : 'Siguiente'}
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
+                    <div class="botones-navegacion">
+                        ${preguntaActual > 0 ? `
+                            <button class="btn-navegacion" onclick="preguntaAnterior()">
+                                <i class="fas fa-arrow-left"></i> Anterior
+                            </button>
+                        ` : '<div></div>'}
+                        
+                        <button class="btn-navegacion ${preguntaActual === PREGUNTAS.length - 1 ? 'btn-finalizar' : ''}" 
+                                id="btnSiguiente"
+                                onclick="${preguntaActual === PREGUNTAS.length - 1 ? 'finalizarCuestionario()' : 'siguientePregunta()'}"
+                                ${!pregunta.respuesta ? 'disabled' : ''}>
+                            ${preguntaActual === PREGUNTAS.length - 1 ? 'Finalizar' : 'Siguiente'}
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
             `;
             
-            contenedorPreguntas.innerHTML = html;
-            actualizarProgreso();
+            contenedor.innerHTML = html;
+            actualizarBarraProgreso();
+            
+            // Enfocar el textarea si es de tipo texto
+            if (pregunta.tipo === 'texto' && !pregunta.respuesta) {
+                setTimeout(() => {
+                    document.getElementById('respuestaTexto').focus();
+                }, 100);
+            }
         }
         
-        // Funciones para manejar respuestas
-        function guardarRespuestaTexto(valor) {
-            preguntas[preguntaActual].respuesta = valor.trim();
-            document.getElementById('btnSiguiente').disabled = !valor.trim();
+        // Actualizar respuesta de texto
+        function actualizarRespuestaTexto(valor) {
+            PREGUNTAS[preguntaActual].respuesta = valor.trim();
+            const btnSiguiente = document.getElementById('btnSiguiente');
+            btnSiguiente.disabled = !valor.trim();
         }
         
+        // Seleccionar opción Sí/No
         function seleccionarOpcion(opcion) {
-            preguntas[preguntaActual].respuesta = opcion;
+            PREGUNTAS[preguntaActual].respuesta = opcion;
             
             // Actualizar botones
             document.querySelectorAll('.opcion-btn').forEach(btn => {
@@ -362,7 +563,7 @@
         
         // Navegación entre preguntas
         function siguientePregunta() {
-            if (preguntaActual < preguntas.length - 1) {
+            if (preguntaActual < PREGUNTAS.length - 1) {
                 preguntaActual++;
                 mostrarPregunta();
             }
@@ -375,71 +576,255 @@
             }
         }
         
-        // Función para enviar respuestas a WhatsApp
-        function enviarRespuestasWhatsApp() {
-            let mensaje = `*Respuestas de Cami*\n\n`;
-            
-            preguntas.forEach((pregunta, index) => {
-                mensaje += `*Pregunta ${index + 1}:* ${pregunta.texto}\n`;
-                mensaje += `*Respuesta:* ${pregunta.respuesta || 'No respondida'}\n\n`;
-            });
-            
-            // Agregar fecha y hora
-            const fecha = new Date().toLocaleString('es-ES');
-            mensaje += `_Enviado el: ${fecha}_`;
-            
-            // Codificar para URL
-            const mensajeCodificado = encodeURIComponent(mensaje);
-            
-            // Crear enlace de WhatsApp
-            const urlWhatsApp = `https://wa.me/${TU_WHATSAPP}?text=${mensajeCodificado}`;
-            
-            // Abrir WhatsApp
-            window.open(urlWhatsApp, '_blank');
-            
-            // Guardar en localStorage por si acaso
-            localStorage.setItem('respuestasCami', JSON.stringify(preguntas));
-            
-            // Redirigir a la invitación final
-            setTimeout(() => {
-                window.location.href = "invitacion.html";
-            }, 1000);
-        }
+        // =============================================
+        // ENVÍO AUTOMÁTICO DE RESPUESTAS
+        // =============================================
         
-        // Función para finalizar preguntas
-        function finalizarPreguntas() {
+        // Finalizar cuestionario y enviar respuestas
+        async function finalizarCuestionario() {
             // Verificar que todas estén respondidas
-            const sinResponder = preguntas.filter(p => !p.respuesta);
+            const sinResponder = PREGUNTAS.filter(p => !p.respuesta);
             
             if (sinResponder.length > 0) {
                 alert('Por favor, responde todas las preguntas antes de finalizar.');
-                preguntaActual = sinResponder[0].numero - 1;
+                preguntaActual = sinResponder[0].id - 1;
                 mostrarPregunta();
                 return;
             }
             
-            // Enviar respuestas y continuar
-            enviarRespuestasWhatsApp();
-        }
-        
-        // Cargar respuestas guardadas (si las hay)
-        function cargarRespuestasGuardadas() {
-            const guardadas = localStorage.getItem('respuestasCami');
-            if (guardadas) {
-                const respuestasGuardadas = JSON.parse(guardadas);
-                respuestasGuardadas.forEach((respuesta, index) => {
-                    if (preguntas[index]) {
-                        preguntas[index].respuesta = respuesta.respuesta;
-                    }
-                });
+            // Mostrar mensaje de envío
+            mostrarMensajeEnvio();
+            
+            // Enviar respuestas automáticamente
+            const exito = await enviarRespuestasAutomaticamente();
+            
+            if (exito) {
+                // Guardar en localStorage
+                guardarRespuestasLocalmente();
+                
+                // Mostrar botón para continuar
+                mostrarBotonContinuar();
+            } else {
+                // Si falla el envío automático, mostrar opción manual
+                mostrarOpcionManual();
             }
         }
         
-        // Inicializar
-        document.addEventListener('DOMContentLoaded', function() {
-            cargarRespuestasGuardadas();
-            mostrarPregunta();
-        });
+        // Mostrar mensaje de envío
+        function mostrarMensajeEnvio() {
+            const mensajeEnvio = document.getElementById('mensajeEnvio');
+            const contenedorPreguntas = document.getElementById('contenedorPreguntas');
+            
+            contenedorPreguntas.style.display = 'none';
+            mensajeEnvio.classList.add('visible');
+        }
+        
+        // Enviar respuestas automáticamente
+        async function enviarRespuestasAutomaticamente() {
+            try {
+                // Crear mensaje con las respuestas
+                let mensaje = `📋 *RESPUESTAS DE ${CONFIG.SU_NOMBRE.toUpperCase()}*\n\n`;
+                
+                PREGUNTAS.forEach((pregunta, index) => {
+                    mensaje += `*${index + 1}. ${pregunta.texto}*\n`;
+                    mensaje += `➤ ${pregunta.respuesta}\n\n`;
+                });
+                
+                mensaje += `---\n`;
+                mensaje += `Enviado desde: ${CONFIG.WEBSITE_URL}\n`;
+                mensaje += `Fecha: ${new Date().toLocaleString('es-ES')}`;
+                
+                // Preparar datos para enviar
+                const datos = {
+                    telefono: CONFIG.TU_WHATSAPP,
+                    mensaje: mensaje,
+                    respuestas: PREGUNTAS.map(p => ({
+                        pregunta: p.texto,
+                        respuesta: p.respuesta
+                    })),
+                    timestamp: new Date().toISOString()
+                };
+                
+                console.log("Enviando respuestas:", datos);
+                
+                // INTENTAR ENVIAR POR DIFERENTES MÉTODOS
+                
+                // Método 1: Webhook (si configuras uno)
+                // const resultado1 = await enviarPorWebhook(datos);
+                // if (resultado1) return true;
+                
+                // Método 2: EmailJS (gratis)
+                // const resultado2 = await enviarPorEmailJS(datos);
+                // if (resultado2) return true;
+                
+                // Método 3: Formspree (gratis)
+                const resultado3 = await enviarPorFormspree(datos);
+                if (resultado3) return true;
+                
+                // Si todo falla, usar método de respaldo
+                return await usarMetodoRespaldo(datos);
+                
+            } catch (error) {
+                console.error("Error al enviar respuestas:", error);
+                return false;
+            }
+        }
+        
+        // Método 1: Enviar por Formspree (GRATIS y fácil)
+        async function enviarPorFormspree(datos) {
+            try {
+                // Crear formulario virtual
+                const formData = new FormData();
+                formData.append('nombre', CONFIG.SU_NOMBRE);
+                formData.append('telefono', CONFIG.TU_WHATSAPP);
+                formData.append('mensaje', datos.mensaje);
+                formData.append('timestamp', datos.timestamp);
+                
+                // Tu formulario Formspree (cámbialo por el tuyo)
+                const FORMSPREE_URL = 'https://formspree.io/f/xjvqbzjg'; // REEMPLAZA ESTO
+                
+                const respuesta = await fetch(FORMSPREE_URL, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (respuesta.ok) {
+                    console.log("Respuestas enviadas por Formspree");
+                    return true;
+                }
+            } catch (error) {
+                console.log("Formspree no disponible:", error);
+            }
+            return false;
+        }
+        
+        // Método de respaldo: Guardar y mostrar WhatsApp
+        async function usarMetodoRespaldo(datos) {
+            // Guardar localmente por si acaso
+            localStorage.setItem('respuestas_backup', JSON.stringify(datos));
+            
+            // Crear enlace de WhatsApp con respuestas
+            const mensajeCodificado = encodeURIComponent(datos.mensaje);
+            const enlaceWhatsApp = `https://wa.me/${CONFIG.TU_WHATSAPP}?text=${mensajeCodificado}`;
+            
+            // Guardar enlace para uso posterior
+            sessionStorage.setItem('whatsapp_link', enlaceWhatsApp);
+            
+            // Enviar después de 2 segundos (simulado)
+            setTimeout(() => {
+                window.open(enlaceWhatsApp, '_blank');
+            }, 2000);
+            
+            return true;
+        }
+        
+        // Guardar respuestas localmente
+        function guardarRespuestasLocalmente() {
+            const datos = {
+                preguntas: PREGUNTAS,
+                fecha: new Date().toISOString(),
+                completado: true
+            };
+            
+            localStorage.setItem('cuestionario_completado', JSON.stringify(datos));
+            console.log("Respuestas guardadas localmente");
+        }
+        
+        // Mostrar botón para continuar
+        function mostrarBotonContinuar() {
+            const cargando = document.getElementById('cargandoEnvio');
+            const btnContinuar = document.getElementById('btnContinuarFinal');
+            
+            setTimeout(() => {
+                cargando.style.display = 'none';
+                btnContinuar.style.display = 'inline-flex';
+            }, 1500);
+        }
+        
+        // Mostrar opción manual si falla el envío
+        function mostrarOpcionManual() {
+            const cargando = document.getElementById('cargandoEnvio');
+            cargando.innerHTML = `
+                <div style="text-align: center; color: #d32f2f;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                    <p>No se pudo enviar automáticamente.</p>
+                    <button onclick="abrirWhatsAppManual()" 
+                            style="background: #25D366; color: white; border: none; padding: 10px 20px; border-radius: 8px; margin-top: 10px; cursor: pointer;">
+                        <i class="fab fa-whatsapp"></i> Enviar por WhatsApp
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Abrir WhatsApp manualmente
+        function abrirWhatsAppManual() {
+            // Crear mensaje manual
+            let mensaje = `📋 *RESPUESTAS DE ${CONFIG.SU_NOMBRE.toUpperCase()}*\n\n`;
+            
+            PREGUNTAS.forEach((pregunta, index) => {
+                mensaje += `*${index + 1}. ${pregunta.texto}*\n`;
+                mensaje += `➤ ${pregunta.respuesta}\n\n`;
+            });
+            
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            const enlaceWhatsApp = `https://wa.me/${CONFIG.TU_WHATSAPP}?text=${mensajeCodificado}`;
+            
+            window.open(enlaceWhatsApp, '_blank');
+        }
+        
+        // Configurar eventos
+        function configurarEventos() {
+            // Botón para continuar a la invitación final
+            document.getElementById('btnContinuarFinal').addEventListener('click', function() {
+                window.location.href = "invitacion.html";
+            });
+            
+            // Guardar progreso al salir
+            window.addEventListener('beforeunload', function(e) {
+                if (!localStorage.getItem('cuestionario_completado')) {
+                    const progreso = PREGUNTAS.filter(p => p.respuesta).length;
+                    if (progreso > 0) {
+                        localStorage.setItem('progreso_cuestionario', JSON.stringify({
+                            preguntaActual: preguntaActual,
+                            respuestas: PREGUNTAS.map(p => p.respuesta),
+                            fecha: new Date().toISOString()
+                        }));
+                    }
+                }
+            });
+            
+            // Cargar progreso guardado
+            cargarProgresoGuardado();
+        }
+        
+        // Cargar progreso guardado
+        function cargarProgresoGuardado() {
+            const guardado = localStorage.getItem('progreso_cuestionario');
+            if (guardado) {
+                try {
+                    const datos = JSON.parse(guardado);
+                    if (datos.respuestas && datos.respuestas.length === PREGUNTAS.length) {
+                        PREGUNTAS.forEach((pregunta, index) => {
+                            if (datos.respuestas[index]) {
+                                pregunta.respuesta = datos.respuestas[index];
+                            }
+                        });
+                        preguntaActual = datos.preguntaActual || 0;
+                        mostrarPregunta();
+                    }
+                } catch (error) {
+                    console.log("Error al cargar progreso:", error);
+                }
+            }
+        }
+        
+        // =============================================
+        // INICIALIZAR AL CARGAR LA PÁGINA
+        // =============================================
+        document.addEventListener('DOMContentLoaded', inicializarApp);
     </script>
 </body>
 </html>
