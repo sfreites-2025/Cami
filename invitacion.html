@@ -246,6 +246,88 @@
             box-shadow: 0 12px 25px rgba(37, 211, 102, 0.4);
         }
         
+        /* PANEL ADMIN (solo visible para ti) */
+        .panel-admin {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #2196F3;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+            transition: all 0.3s;
+            display: none;
+            opacity: 0.8;
+        }
+        
+        .panel-admin:hover {
+            transform: translateY(-3px);
+            background: #1976D2;
+            opacity: 1;
+        }
+        
+        /* MODAL ADMIN */
+        .modal-admin {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-contenido {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .modal-titulo {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 20px;
+        }
+        
+        .respuesta-item {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 4px solid #4CAF50;
+            font-size: 13px;
+        }
+        
+        .respuesta-fecha {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .btn-cerrar {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            font-size: 14px;
+        }
+        
         /* CRÉDITOS */
         .creditos {
             margin-top: 30px;
@@ -345,6 +427,13 @@
             .scroll-indicator {
                 bottom: 15px;
                 right: 15px;
+            }
+            
+            .panel-admin {
+                left: 10px;
+                bottom: 10px;
+                padding: 6px 12px;
+                font-size: 11px;
             }
         }
         
@@ -465,6 +554,32 @@
         <div class="scroll-indicator" id="scrollIndicator" onclick="scrollToTop()">
             <i class="fas fa-chevron-up"></i>
         </div>
+        
+        <!-- Panel admin (sólo visible para ti) -->
+        <div class="panel-admin" id="panelAdmin">
+            <i class="fas fa-eye"></i> Ver respuestas
+        </div>
+        
+        <!-- Modal para ver respuestas -->
+        <div class="modal-admin" id="modalAdmin">
+            <div class="modal-contenido">
+                <h3 class="modal-titulo">
+                    <i class="fas fa-database"></i> Respuestas Registradas
+                </h3>
+                
+                <div id="adminInfo" style="text-align: center; margin-bottom: 15px; font-size: 14px;">
+                    <p>Respuestas guardadas:</p>
+                </div>
+                
+                <div class="respuestas-lista" id="respuestasLista">
+                    <!-- Aquí se cargarán las respuestas -->
+                </div>
+                
+                <button class="btn-cerrar" onclick="cerrarModal()">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -472,16 +587,73 @@
         // CONFIGURACIÓN
         // =============================================
         const TU_WHATSAPP = "584143568666";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw0LzC598QjPwEQjsACo8UDfyLgbunQAtzSxiUBkmcucxuvHEpmtdz104S42k3H4TLQeg/exec";
+        const ADMIN_KEY = "salomon123"; // Cambia esta clave si quieres
         // =============================================
         
         // Variables
         let contadorNo = 0;
+        let respuestasGuardadas = [];
+        
+        // Elementos del DOM
         const btnSi = document.getElementById('btnSi');
         const btnNo = document.getElementById('btnNo');
         const mensajeFinal = document.getElementById('mensajeFinal');
         const numeroContador = document.getElementById('numeroContador');
         const btnWhatsApp = document.getElementById('btnWhatsApp');
         const scrollIndicator = document.getElementById('scrollIndicator');
+        const panelAdmin = document.getElementById('panelAdmin');
+        const modalAdmin = document.getElementById('modalAdmin');
+        const adminInfo = document.getElementById('adminInfo');
+        const respuestasLista = document.getElementById('respuestasLista');
+        
+        // Función para guardar respuesta en Google Sheets
+        async function guardarRespuesta(respuesta) {
+            const fecha = new Date();
+            const datos = {
+                nombre: "Cami",
+                respuesta: respuesta,
+                vecesNo: contadorNo,
+                fecha: fecha.toLocaleString('es-ES'),
+                timestamp: fecha.toISOString(),
+                ip: await obtenerIP()
+            };
+            
+            try {
+                // 1. Guardar en Google Sheets
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Importante para Google Apps Script
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(datos)
+                });
+                
+                // 2. Guardar localmente como backup
+                respuestasGuardadas.push(datos);
+                localStorage.setItem('respuestas_cami', JSON.stringify(respuestasGuardadas));
+                
+                return true;
+            } catch (error) {
+                console.error("Error al guardar:", error);
+                // Fallback: guardar solo localmente
+                respuestasGuardadas.push(datos);
+                localStorage.setItem('respuestas_cami', JSON.stringify(respuestasGuardadas));
+                return true;
+            }
+        }
+        
+        // Función para obtener IP
+        async function obtenerIP() {
+            try {
+                const respuesta = await fetch('https://api.ipify.org?format=json');
+                const data = await respuesta.json();
+                return data.ip;
+            } catch {
+                return "No disponible";
+            }
+        }
         
         // Hacer crecer el botón "Sí" gradualmente
         function hacerCrecerBtnSi() {
@@ -512,14 +684,19 @@
             // Agregar clase de expansión
             btnSi.classList.add('expandiendo');
             
-            // Mostrar mensaje final después de la expansión
-            setTimeout(() => {
-                mostrarMensajeFinal();
+            // Guardar respuesta y mostrar mensaje final
+            setTimeout(async () => {
+                await mostrarMensajeFinal();
             }, 1800);
         }
         
         // Mostrar mensaje final
-        function mostrarMensajeFinal() {
+        async function mostrarMensajeFinal() {
+            const respuestaTexto = "Sí acepto dulce, tú invitas y yo pago";
+            
+            // Guardar respuesta en Google Sheets
+            await guardarRespuesta(respuestaTexto);
+            
             // Ocultar contenedor de botones y contador
             document.getElementById('contenedorBotones').style.display = 'none';
             document.getElementById('contadorNo').style.display = 'none';
@@ -527,7 +704,7 @@
             // Mostrar mensaje final
             mensajeFinal.style.display = 'block';
             
-            // Configurar WhatsApp
+            // Configurar WhatsApp (¡ESTO SE MANTIENE!)
             const mensaje = encodeURIComponent("Sí acepto dulce, tú invitas y yo pago");
             btnWhatsApp.href = `https://wa.me/${TU_WHATSAPP}?text=${mensaje}`;
             
@@ -536,15 +713,7 @@
                 mensajeFinal.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 500);
             
-            // Guardar en localStorage
-            const resultado = {
-                aceptado: true,
-                fecha: new Date().toISOString(),
-                vecesNo: contadorNo
-            };
-            localStorage.setItem('invitacionAceptada', JSON.stringify(resultado));
-            
-            // Enviar notificación a WhatsApp después de 2 segundos
+            // Enviar notificación a WhatsApp después de 2 segundos (¡ESTO SE MANTIENE!)
             setTimeout(() => {
                 const notificacion = encodeURIComponent(
                     `Ok esta bien, plomo a la lata\n\n` +
@@ -553,6 +722,78 @@
                 );
                 window.open(`https://wa.me/${TU_WHATSAPP}?text=${notificacion}`, '_blank');
             }, 2000);
+            
+            // Mostrar panel admin después de 3 segundos (sólo si eres admin)
+            setTimeout(() => {
+                if (localStorage.getItem('es_admin') === 'true') {
+                    panelAdmin.style.display = 'block';
+                }
+            }, 3000);
+        }
+        
+        // Cargar respuestas guardadas
+        function cargarRespuestas() {
+            try {
+                const guardadas = localStorage.getItem('respuestas_cami');
+                if (guardadas) {
+                    respuestasGuardadas = JSON.parse(guardadas);
+                    
+                    // Mostrar en modal
+                    adminInfo.innerHTML = `
+                        <p><strong>${respuestasGuardadas.length}</strong> respuestas guardadas</p>
+                        <p style="font-size: 12px; color: #666;">(Última: ${respuestasGuardadas[respuestasGuardadas.length-1]?.fecha})</p>
+                    `;
+                    
+                    respuestasLista.innerHTML = respuestasGuardadas.map((r, i) => `
+                        <div class="respuesta-item">
+                            <strong>Respuesta ${i+1}:</strong> ${r.respuesta}<br>
+                            <span class="respuesta-fecha">
+                                ${r.fecha} | Veces "No": ${r.vecesNo} | IP: ${r.ip || "N/A"}
+                            </span>
+                        </div>
+                    `).join('');
+                } else {
+                    adminInfo.innerHTML = '<p>No hay respuestas guardadas todavía</p>';
+                }
+            } catch (error) {
+                console.error("Error cargando respuestas:", error);
+                adminInfo.innerHTML = '<p>Error cargando respuestas</p>';
+            }
+        }
+        
+        // Mostrar modal admin
+        function mostrarModalAdmin() {
+            modalAdmin.style.display = 'flex';
+            cargarRespuestas();
+        }
+        
+        // Cerrar modal
+        function cerrarModal() {
+            modalAdmin.style.display = 'none';
+        }
+        
+        // Verificar si es admin
+        function verificarAdmin() {
+            const esAdmin = localStorage.getItem('es_admin') === 'true';
+            if (esAdmin) {
+                panelAdmin.style.display = 'block';
+            }
+            
+            // Modo secreto: Si presionas 5 veces seguidas el título
+            let clicksTitulo = 0;
+            document.querySelector('.titulo-invitacion').addEventListener('click', () => {
+                clicksTitulo++;
+                setTimeout(() => { clicksTitulo = 0; }, 2000);
+                
+                if (clicksTitulo === 5) {
+                    const clave = prompt("Ingresa la clave de administrador:");
+                    if (clave === ADMIN_KEY) {
+                        localStorage.setItem('es_admin', 'true');
+                        panelAdmin.style.display = 'block';
+                        alert("Modo administrador activado ✓");
+                    }
+                }
+            });
         }
         
         // Mostrar/ocultar indicador de scroll
@@ -579,6 +820,9 @@
             // Controlar indicador de scroll
             window.addEventListener('scroll', toggleScrollIndicator);
             
+            // Verificar si es admin
+            verificarAdmin();
+            
             // Cargar estado previo
             const guardado = localStorage.getItem('invitacionAceptada');
             if (guardado) {
@@ -586,6 +830,12 @@
                 if (data.aceptado) {
                     mostrarMensajeFinal();
                 }
+            }
+            
+            // Cargar respuestas guardadas
+            const respuestasGuardadas = localStorage.getItem('respuestas_cami');
+            if (respuestasGuardadas) {
+                console.log("Respuestas encontradas:", JSON.parse(respuestasGuardadas).length);
             }
             
             // Evento para el botón "NO"
@@ -641,7 +891,18 @@
                 iniciarExpansion();
             });
             
+            // Panel admin
+            panelAdmin.addEventListener('click', mostrarModalAdmin);
+            
+            // Cerrar modal al hacer clic fuera
+            modalAdmin.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    cerrarModal();
+                }
+            });
+            
             console.log("WhatsApp configurado para:", TU_WHATSAPP);
+            console.log("Google Sheets configurado para:", GOOGLE_SCRIPT_URL);
         });
     </script>
 </body>
