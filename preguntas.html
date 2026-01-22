@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preguntas para Cami</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .preguntas-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .pregunta-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+        
+        .progreso {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .paso {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #666;
+            z-index: 2;
+        }
+        
+        .paso.activo {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .paso.completado {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .linea-progreso {
+            position: absolute;
+            top: 50%;
+            left: 17px;
+            right: 17px;
+            height: 3px;
+            background: #e0e0e0;
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+        
+        .linea-progreso-activa {
+            position: absolute;
+            top: 50%;
+            left: 17px;
+            height: 3px;
+            background: #4CAF50;
+            z-index: 1;
+            transform: translateY(-50%);
+            transition: width 0.5s ease;
+        }
+        
+        .pregunta-texto {
+            font-size: 22px;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        
+        .respuesta-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 25px;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        
+        .respuesta-input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        
+        .opciones {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .opcion-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px 25px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .opcion-btn:hover {
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+        
+        .opcion-btn.seleccionado {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-siguiente {
+            background: #764ba2;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            float: right;
+        }
+        
+        .btn-siguiente:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .btn-siguiente:hover:not(:disabled) {
+            background: #5a3890;
+            transform: translateY(-2px);
+        }
+        
+        .pregunta-numero {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .contador {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f0f4ff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="preguntas-container">
+        <div class="pregunta-box">
+            <div class="contador" id="contador">Pregunta 1 de 5</div>
+            
+            <!-- Barra de progreso -->
+            <div class="progreso">
+                <div class="linea-progreso"></div>
+                <div class="linea-progreso-activa" id="lineaProgreso"></div>
+                <div class="paso activo" id="paso1">1</div>
+                <div class="paso" id="paso2">2</div>
+                <div class="paso" id="paso3">3</div>
+                <div class="paso" id="paso4">4</div>
+                <div class="paso" id="paso5">5</div>
+            </div>
+            
+            <!-- Contenedor de preguntas -->
+            <div id="contenedorPreguntas">
+                <!-- Las preguntas se cargarán dinámicamente aquí -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // CONFIGURACIÓN 
+        // =============================================
+        const TU_WHATSAPP = "584143568666"; 
+        const TU_NOMBRE = "Salomón"; 
+        // =============================================
+        
+        // Array de preguntas
+        const preguntas = [
+            {
+                id: 1,
+                texto: "¿Qué te ha parecido hasta los momentos mi existencia en tu vida?",
+                tipo: "texto",
+                respuesta: "",
+                numero: 1
+            },
+            {
+                id: 2,
+                texto: "¿Me vas a terminar de pasar tu Curriculum algún día?",
+                tipo: "si_no",
+                opciones: ["Sí", "No"],
+                respuesta: "",
+                numero: 2
+            },
+            {
+                id: 3,
+                texto: "¿Algún día veré el casting?",
+                tipo: "si_no",
+                opciones: ["Sí", "No"],
+                respuesta: "",
+                numero: 3
+            },
+            {
+                id: 4,
+                texto: "¿Cuándo me invitas a una colaboración en TikTok?",
+                tipo: "texto",
+                respuesta: "",
+                numero: 4
+            },
+            {
+                id: 5,
+                texto: "¿Me vas a explicar química?",
+                tipo: "si_no",
+                opciones: ["Sí", "No"],
+                respuesta: "",
+                numero: 5
+            }
+        ];
+        
+        let preguntaActual = 0;
+        const respuestas = [];
+        
+        // Elementos DOM
+        const contenedorPreguntas = document.getElementById('contenedorPreguntas');
+        const contador = document.getElementById('contador');
+        const lineaProgreso = document.getElementById('lineaProgreso');
+        
+        // Función para actualizar progreso
+        function actualizarProgreso() {
+            const porcentaje = (preguntaActual / (preguntas.length - 1)) * 100;
+            lineaProgreso.style.width = `${porcentaje}%`;
+            
+            // Actualizar pasos
+            for (let i = 1; i <= preguntas.length; i++) {
+                const paso = document.getElementById(`paso${i}`);
+                if (i - 1 < preguntaActual) {
+                    paso.className = 'paso completado';
+                } else if (i - 1 === preguntaActual) {
+                    paso.className = 'paso activo';
+                } else {
+                    paso.className = 'paso';
+                }
+            }
+            
+            contador.textContent = `Pregunta ${preguntaActual + 1} de ${preguntas.length}`;
+        }
+        
+        // Función para mostrar pregunta actual
+        function mostrarPregunta() {
+            const pregunta = preguntas[preguntaActual];
+            
+            let html = `
+                <div class="pregunta-numero">
+                    <i class="fas fa-question-circle"></i>
+                    Pregunta #${pregunta.numero}
+                </div>
+                <div class="pregunta-texto">${pregunta.texto}</div>
+            `;
+            
+            if (pregunta.tipo === 'texto') {
+                html += `
+                    <textarea class="respuesta-input" 
+                              id="respuestaTexto" 
+                              placeholder="Escribe tu respuesta aquí, porfavor y gracias"
+                              oninput="guardarRespuestaTexto(this.value)">${pregunta.respuesta || ''}</textarea>
+                `;
+            } else if (pregunta.tipo === 'si_no') {
+                html += `
+                    <div class="opciones">
+                        ${pregunta.opciones.map(opcion => `
+                            <button class="opcion-btn ${pregunta.respuesta === opcion ? 'seleccionado' : ''}"
+                                    onclick="seleccionarOpcion('${opcion}')">
+                                ${opcion}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            html += `
+                <div style="clear: both; padding-top: 20px;">
+                    ${preguntaActual > 0 ? `
+                        <button class="btn-siguiente" onclick="preguntaAnterior()" style="float: left; background: #666;">
+                            <i class="fas fa-arrow-left"></i> Anterior
+                        </button>
+                    ` : ''}
+                    
+                    <button class="btn-siguiente" id="btnSiguiente" 
+                            onclick="${preguntaActual === preguntas.length - 1 ? 'finalizarPreguntas()' : 'siguientePregunta()'}"
+                            ${!pregunta.respuesta ? 'disabled' : ''}>
+                        ${preguntaActual === preguntas.length - 1 ? 'Finalizar' : 'Siguiente'}
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            `;
+            
+            contenedorPreguntas.innerHTML = html;
+            actualizarProgreso();
+        }
+        
+        // Funciones para manejar respuestas
+        function guardarRespuestaTexto(valor) {
+            preguntas[preguntaActual].respuesta = valor.trim();
+            document.getElementById('btnSiguiente').disabled = !valor.trim();
+        }
+        
+        function seleccionarOpcion(opcion) {
+            preguntas[preguntaActual].respuesta = opcion;
+            
+            // Actualizar botones
+            document.querySelectorAll('.opcion-btn').forEach(btn => {
+                btn.classList.remove('seleccionado');
+                if (btn.textContent.trim() === opcion) {
+                    btn.classList.add('seleccionado');
+                }
+            });
+            
+            document.getElementById('btnSiguiente').disabled = false;
+        }
+        
+        // Navegación entre preguntas
+        function siguientePregunta() {
+            if (preguntaActual < preguntas.length - 1) {
+                preguntaActual++;
+                mostrarPregunta();
+            }
+        }
+        
+        function preguntaAnterior() {
+            if (preguntaActual > 0) {
+                preguntaActual--;
+                mostrarPregunta();
+            }
+        }
+        
+        // Función para enviar respuestas a WhatsApp
+        function enviarRespuestasWhatsApp() {
+            let mensaje = `*Respuestas de Cami*\n\n`;
+            
+            preguntas.forEach((pregunta, index) => {
+                mensaje += `*Pregunta ${index + 1}:* ${pregunta.texto}\n`;
+                mensaje += `*Respuesta:* ${pregunta.respuesta || 'No respondida'}\n\n`;
+            });
+            
+            // Agregar fecha y hora
+            const fecha = new Date().toLocaleString('es-ES');
+            mensaje += `_Enviado el: ${fecha}_`;
+            
+            // Codificar para URL
+            const mensajeCodificado = encodeURIComponent(mensaje);
+            
+            // Crear enlace de WhatsApp
+            const urlWhatsApp = `https://wa.me/${TU_WHATSAPP}?text=${mensajeCodificado}`;
+            
+            // Abrir WhatsApp
+            window.open(urlWhatsApp, '_blank');
+            
+            // Guardar en localStorage por si acaso
+            localStorage.setItem('respuestasCami', JSON.stringify(preguntas));
+            
+            // Redirigir a la invitación final
+            setTimeout(() => {
+                window.location.href = "invitacion.html";
+            }, 1000);
+        }
+        
+        // Función para finalizar preguntas
+        function finalizarPreguntas() {
+            // Verificar que todas estén respondidas
+            const sinResponder = preguntas.filter(p => !p.respuesta);
+            
+            if (sinResponder.length > 0) {
+                alert('Por favor, responde todas las preguntas antes de finalizar.');
+                preguntaActual = sinResponder[0].numero - 1;
+                mostrarPregunta();
+                return;
+            }
+            
+            // Enviar respuestas y continuar
+            enviarRespuestasWhatsApp();
+        }
+        
+        // Cargar respuestas guardadas (si las hay)
+        function cargarRespuestasGuardadas() {
+            const guardadas = localStorage.getItem('respuestasCami');
+            if (guardadas) {
+                const respuestasGuardadas = JSON.parse(guardadas);
+                respuestasGuardadas.forEach((respuesta, index) => {
+                    if (preguntas[index]) {
+                        preguntas[index].respuesta = respuesta.respuesta;
+                    }
+                });
+            }
+        }
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarRespuestasGuardadas();
+            mostrarPregunta();
+        });
+    </script>
+</body>
+</html>
